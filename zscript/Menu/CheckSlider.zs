@@ -52,8 +52,6 @@ class OptionMenuCheckSliderBase : OptionMenuSliderBase {
 		}
 
 		mSliderShort = right + maxlen > screen.GetWidth();
-		
-		Console.printf("min: "..min.." max: "..max.." range: "..range);
 
 		if (!mSliderShort) {
 			DrawSliderElement(Font.CR_WHITE, x, cy, "\x10\x11\x11\x11\x11\x11\x11\x11\x11\x11\x11\x12", grayed);
