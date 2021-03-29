@@ -10,8 +10,8 @@ class OptionMenuItemCVARControl : OptionMenuItemControlBase {
 	}
 
 	override int Draw(OptionMenuDescriptor desc, int y, int indent, bool selected) {
-		drawLabel(indent, y, mWaiting? OptionMenuSettings.mFontColorHighlight: 
-			(selected? OptionMenuSettings.mFontColorSelection : OptionMenuSettings.mFontColor));
+		drawLabel(indent, y, (mWaiting? OptionMenuSettings.mFontColorHighlight: 
+			(selected? OptionMenuSettings.mFontColorSelection : OptionMenuSettings.mFontColor)));
 
 		String description;
 		int Key1=CV_key1.getInt(), Key2=CV_key2.getInt();

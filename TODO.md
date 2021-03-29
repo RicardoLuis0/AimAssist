@@ -1,0 +1,2 @@
+ - [x] fix menu components
+ - [ ] general code improvements

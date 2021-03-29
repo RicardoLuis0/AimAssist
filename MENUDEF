@@ -45,12 +45,17 @@ OptionMenu "AimAssistOptions" {
 
 OptionMenu "AimAssistControls" {
 	Title "Aim Assist Controls"
-	StaticText ""
+	ScrollTop 2
+	StaticTextSwitchable "$CNTRLMNU_SWITCHTEXT1", "$CNTRLMNU_SWITCHTEXT2", "ControlMessage"
 	StaticText ""
 	Control "Toggle Key","netevent AimAssistToggle"
 	StaticText ""
 	CVARControl "Hold Toggle Key","AIM_ASSIST_HOLD_KEY_1","AIM_ASSIST_HOLD_KEY_2"
 	StaticText ""
+}
+
+AddOptionMenu "CustomizeControls" after "ChatControlsMenu" {
+	Submenu "Aim Assist Mod","AimAssistControls"
 }
 
 OptionMenu "AimAssistConfiguration" {

@@ -1,8 +1,9 @@
-class OptionMenuItemCheckValSlider : OptionMenuItemCheckSlider{
+
+class OptionMenuItemCheckValSlider : OptionMenuItemCheckSlider {
 	int val;
 	bool not;
 
-	OptionMenuItemSlider Init(String label, Name command, double min, double max, double step, int showval = 1,CVar check_var=null,int check_val=0,bool check_not=true) {
+	OptionMenuItemCheckValSlider Init(String label, Name command, double min, double max, double step, int showval = 1,CVar check_var=null,int check_val=0,bool check_not=true) {
 		Super.Init(label, command, min, max, step, showval,check_var);
 		val=check_val;
 		not=check_not;
@@ -10,15 +11,15 @@ class OptionMenuItemCheckValSlider : OptionMenuItemCheckSlider{
 	}
 
 	override bool isGrayed() {
-		return check != null && not?!(check.GetInt()==val):((check.GetInt()==val));
+		return mGrayCheck != null && not?!(mGrayCheck.GetInt()==val):((mGrayCheck.GetInt()==val));
 	}
 }
 
-class OptionMenuItemReverseCheckValSlider : OptionMenuItemReverseCheckSlider{
+class OptionMenuItemReverseCheckValSlider : OptionMenuItemReverseSlider {
 	int val;
 	bool not;
 
-	OptionMenuItemSlider Init(String label, Name command, double min, double max, double step, int showval = 1,CVar check_var=null,int check_val=0,bool check_not=true) {
+	OptionMenuItemReverseCheckValSlider Init(String label, Name command, double min, double max, double step, int showval = 1,CVar check_var=null,int check_val=0,bool check_not=true) {
 		Super.Init(label, command, min, max, step, showval,check_var);
 		val=check_val;
 		not=check_not;
@@ -26,7 +27,7 @@ class OptionMenuItemReverseCheckValSlider : OptionMenuItemReverseCheckSlider{
 	}
 
 	override bool isGrayed() {
-		return check != null && not?!(check.GetInt()==val):((check.GetInt()==val));
+		return mGrayCheck != null && not?!(mGrayCheck.GetInt()==val):((mGrayCheck.GetInt()==val));
 	}
 }
 
@@ -35,7 +36,7 @@ class  OptionMenuItemCheckValOption:OptionMenuItemOption{
 	int val;
 	bool not;
 
-	OptionMenuItemOption Init(String label, Name command, Name values, int center = 0, CVar check_var = null,int check_val=0,bool check_not=true){
+	OptionMenuItemCheckValOption Init(String label, Name command, Name values, int center = 0, CVar check_var = null,int check_val=0,bool check_not=true){
 		Super.Init(label, command, values, null, center);
 		check=check_var;
 		val=check_val;
