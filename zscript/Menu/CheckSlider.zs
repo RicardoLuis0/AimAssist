@@ -19,7 +19,7 @@ class OptionMenuCheckSliderBase : OptionMenuSliderBase {
 	}
 	
 	virtual double GetSliderTextValue() {
-		return 0;
+		return GetSliderValue();
 	}
 
 	virtual bool isGrayed(void) {
