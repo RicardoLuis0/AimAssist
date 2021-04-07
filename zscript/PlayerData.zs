@@ -31,6 +31,8 @@ class AimAssistPlayerData {
 	int aim_height_mode;
 
 	int on_obstruction;
+	bool mIsEnabled;
+	double mStep;
 	
 	void UpdateCVARs(int pnum){
 		PlayerInfo player=players[pnum];
@@ -60,6 +62,8 @@ class AimAssistPlayerData {
 		transition_start=CVAR.GetCVar("AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_START",player).getFloat();
 		transition_end=CVAR.GetCVar("AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_END",player).getFloat();
 		on_obstruction=CVAR.GetCVar("AIM_ASSIST_ON_OBSTRUCTION",player).getInt();
+		mIsEnabled=CVAR.GetCVar("rc_enabled",player).getBool();
+		mStep=CVAR.GetCVar("rc_step",player).getFloat();
 	}
 	
 	float lerp(float v0,float v1,float t){
@@ -96,7 +100,7 @@ class AimAssistPlayerData {
 		}
 	}
 	//do linetrace and get results
-	play Actor,double,Vector3 doTrace(PlayerPawn a,double i_angle,double i_rotation,Actor closest,double closest_distance) {
+	play Actor,double,Vector3 doTrace(PlayerPawn a,double i_angle,double i_rotation,Actor closest,double closest_distance){
 		FLineTraceData t;
 		Vector3 hitloc=(0,0,0);
 		//do a linetrace around i_a and i_r in a circle
@@ -123,6 +127,22 @@ class AimAssistPlayerData {
 	
 	bool aimEnabled(){
 		return (enabled&&!(hold1||hold2))||(!enabled&&(hold1||hold2));
+	}
+	
+	/* Copyright Alexander Kromm (mmaulwurff@gmail.com) 2020-2021 */
+	static double makeNewPitch(double pitch, double step){
+		if(abs(pitch) <= step){
+			return 0;
+		} else if (pitch > 0){
+			return pitch - step;
+		} else {
+			return pitch + step;
+		}
+	}
+	
+	play void doRecenter(PlayerPawn pawn){
+		if(!mIsEnabled)return;
+		pawn.A_SetPitch(makeNewPitch(pawn.pitch, mStep), SPF_Interpolate);
 	}
 	
 }

@@ -222,9 +222,12 @@ class AimAssistHandler:StaticEventHandler{
 				//if rotation speed is higher than differece, set to target pitch
 				pawn.A_SetPitch(target_pitch,SPF_INTERPOLATE);
 			}
-		}else if(do_mark){
-			//if no target, remove markers
-			ClearMarkers();
+		}else{
+			if(do_mark){
+				//if no target, remove markers
+				ClearMarkers();
+			}
+			playerData[pnum].doRecenter(pawn);
 		}
 	}
 
