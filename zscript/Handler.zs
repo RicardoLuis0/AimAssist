@@ -16,11 +16,14 @@ class AimAssistHandler:StaticEventHandler{
 	}
 
 	override void WorldLoaded(WorldEvent e){
-		UpdateAllCVARs();
 		marker1=null;
 		marker2=null;
 		marker3=null;
 		marker4=null;
+	}
+	
+	override void PlayerEntered(PlayerEvent e){
+		UpdateCVARs(e.playernumber);
 	}
 	
 	override void WorldUnloaded(WorldEvent e){
