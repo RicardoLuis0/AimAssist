@@ -1,2 +1,3 @@
  - [x] fix menu components
- - [ ] general code improvements
+ - [x] general code improvements
+ - [x] multiplayer support

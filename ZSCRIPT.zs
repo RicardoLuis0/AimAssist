@@ -1,4 +1,5 @@
 version "2.5"
-#include "zscript/handler.zs"
-#include "zscript/menu.zs"
-#include "zscript/marker.zs"
+#include "zscript/Handler.zs"
+#include "zscript/PlayerData.zs"
+#include "zscript/Marker.zs"
+#include "zscript/Menu.zs"
