@@ -48,6 +48,8 @@ OptionMenu "AimAssistControls" {
 	ScrollTop 2
 	StaticTextSwitchable "$CNTRLMNU_SWITCHTEXT1", "$CNTRLMNU_SWITCHTEXT2", "ControlMessage"
 	StaticText ""
+	Control "Center View","netevent AimAssistCenterView"
+	StaticText ""
 	Control "Toggle Key","netevent AimAssistToggle"
 	StaticText ""
 	CVARControl "Hold Toggle Key","AIM_ASSIST_HOLD_KEY_1","AIM_ASSIST_HOLD_KEY_2"

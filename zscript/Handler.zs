@@ -254,6 +254,9 @@ class AimAssistHandler:StaticEventHandler{
 				CVAR.getCVar("AIM_ASSIST_ENABLED",players[e.player]).setBool(playerData[e.player].enabled);
 				console.printf("Aim Assist "..(playerData[e.player].enabled?"On":"Off"));
 			}
+		}else if(e.name=="AimAssistCenterView"){
+			//center view
+			if(players[e.player].mo)players[e.player].mo.A_SetPitch(0,SPF_INTERPOLATE);
 		}else if(e.name=="AimAssistHoldKey1Down"){
 			//toggle hold key1 pressed
 			playerData[e.player].hold1=true;
