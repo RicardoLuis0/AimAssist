@@ -162,7 +162,13 @@ OptionMenu "AimAssistDebugOptions" {
 	StaticText "Show markers for current aim","DarkRed"
 	StaticText ""
 }
+
 AddOptionMenu "OptionsMenu"{
-    StaticText ""
     Submenu "Aim Assist Options", "AimAssistOptions"
+    StaticText ""
+}
+
+AddOptionMenu "OptionsMenuSimple"{
+    Submenu "Aim Assist Options", "AimAssistOptions"
+    StaticText ""
 }
