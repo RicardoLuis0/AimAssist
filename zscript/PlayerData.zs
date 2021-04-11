@@ -34,6 +34,8 @@ class AimAssistPlayerData {
 	bool mIsEnabled;
 	double mStep;
 	
+	bool always_recenter;
+	
 	void UpdateCVARs(int pnum){
 		PlayerInfo player=players[pnum];
 		enabled=CVAR.GetCVar("AIM_ASSIST_ENABLED",player).getBool();
@@ -63,6 +65,7 @@ class AimAssistPlayerData {
 		transition_end=CVAR.GetCVar("AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_END",player).getFloat();
 		on_obstruction=CVAR.GetCVar("AIM_ASSIST_ON_OBSTRUCTION",player).getInt();
 		mIsEnabled=CVAR.GetCVar("rc_enabled",player).getBool();
+		always_recenter=CVAR.GetCVar("rc_always_enabled",player).getBool();
 		mStep=CVAR.GetCVar("rc_step",player).getFloat();
 	}
 	

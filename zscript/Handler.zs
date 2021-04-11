@@ -103,7 +103,8 @@ class AimAssistHandler:StaticEventHandler{
 	}
 
 	//main method, does all work
-	void doAim(int pnum){
+	bool doAim(int pnum){
+		if(!playerData[pnum].aimEnabled()) return false;
 		PlayerPawn pawn=players[pnum].mo;
 		
 		bool do_mark=pnum==consoleplayer&&mark;
@@ -198,7 +199,7 @@ class AimAssistHandler:StaticEventHandler{
 						}
 						break;
 					case 0://don't aim
-						return;
+						return false;
 					}
 				}else if(do_mark){
 					ClearObstructionMarkers();
@@ -225,20 +226,23 @@ class AimAssistHandler:StaticEventHandler{
 				//if rotation speed is higher than differece, set to target pitch
 				pawn.A_SetPitch(target_pitch,SPF_INTERPOLATE);
 			}
+			return true;
 		}else{
 			if(do_mark){
 				//if no target, remove markers
 				ClearMarkers();
 			}
-			playerData[pnum].doRecenter(pawn);
+			return false;
 		}
 	}
 
 	override void WorldTick(){
 		//if no keys are held and it's enabled, or keys are held and it's disabled, run the aim assist
 		for(int i=0;i<MAXPLAYERS;i++){
-			if(playeringame[i]&&playerData[i].aimEnabled()){
-				doAim(i);
+			if(playeringame[i]){
+				if(!doAim(i)||playerData[i].always_recenter){
+					playerData[i].doRecenter(players[i].mo);
+				}
 			}
 		}
 		if (gameaction == ga_savegame || gameaction == ga_autosave) {

@@ -85,7 +85,6 @@ OptionMenu "AimAssistConfiguration" {
 	Option "Targeting Method","AIM_ASSIST_METHOD","AimAssist_AssistMethods"
 	StaticText "Target Selection Method","DarkRed"
 	StaticText "\"Closer to crosshair\" has better performance","DarkRed"
-	StaticText ""
 }
 
 OptionMenu "AimAssistRecenterConfiguration" {
@@ -95,8 +94,10 @@ OptionMenu "AimAssistRecenterConfiguration" {
 	Option "Enabled","rc_enabled","OnOff"
 	StaticText ""
 	Slider "Step","rc_step",0.1,5,0.1
-	
-	
+	StaticText ""
+	Option "Always Enabled","rc_always_enabled","OnOff"
+	StaticText "Always run Recenter, even while tracking an enemy. This is not recommended to be enabled,","DarkRed"
+	StaticText "as it can cause both mods to try to move the player aim in opposite directions","DarkRed"
 }
 
 OptionMenu "AimAssistAimOffset" {

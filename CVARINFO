@@ -22,3 +22,4 @@ USER INT AIM_ASSIST_ON_OBSTRUCTION=1;
 
 user bool rc_enabled = false;
 user float rc_step = 1.0;
+user bool rc_always_enabled = false;
