@@ -22,7 +22,7 @@ class OptionMenuCheckSliderBase : OptionMenuSliderBase {
 		return GetSliderValue();
 	}
 
-	virtual bool isGrayed(void) {
+	override bool isGrayed(void) {
 		return mGrayCheck != NULL && !mGrayCheck.GetInt();
 	}
 
