@@ -20,6 +20,11 @@ class AimAssistHandler:StaticEventHandler{
 		marker2=null;
 		marker3=null;
 		marker4=null;
+		for(int i=0;i<MAXPLAYERS;i++){
+			if(playeringame[i]){
+				UpdateCVARs(i);
+			}
+		}
 	}
 	
 	override void PlayerEntered(PlayerEvent e){
