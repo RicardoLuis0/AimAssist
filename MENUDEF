@@ -17,7 +17,7 @@ OptionValue "AimAssist_OnObstruction" {
 
 OptionMenu "AimAssistOptions" {
 	Title "Aim Assist"
-	StaticText "v0.7.4 by RicardoLuis0","Gold"
+	StaticText "v0.7.5 by RicardoLuis0","Gold"
 	StaticText ""
 	StaticText ""
 	Option "Aim Assist Enabled","AIM_ASSIST_ENABLED","OnOff"
