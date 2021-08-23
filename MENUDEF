@@ -60,7 +60,7 @@ OptionMenu "AimAssistControls" {
 	StaticText ""
 }
 
-AddOptionMenu "CustomizeControls" after "ChatControlsMenu" {
+AddOptionMenu "CustomizeControls" {
 	Submenu "Aim Assist Mod","AimAssistControls"
 }
 
@@ -169,7 +169,3 @@ AddOptionMenu "OptionsMenu"{
     StaticText ""
 }
 
-AddOptionMenu "OptionsMenuSimple"{
-    Submenu "Aim Assist Options", "AimAssistOptions"
-    StaticText ""
-}

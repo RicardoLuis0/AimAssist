@@ -1,11 +1,16 @@
-class OptionMenuItemReverseSlider : OptionMenuItemSlider{
+class OptionMenuItemReverseCheckSlider : OptionMenuItemReverseSlider{
+	protected CVar check;
 
-	OptionMenuItemSlider Init(String label, Name command, double min, double max, double step, int showval = 1) {
+	OptionMenuItemSlider Init(String label, Name command, double min, double max, double step, int showval = 1,CVar check_var=null) {
 		Super.Init(label, command, min, max, step, showval);
+		check=check_var;
 		return self;
 	}
 
 	protected void DrawReverseSlider (int x, int y, double min, double max, double cur, int fracdigits, int indent) {
+		bool grayed=isGrayed();
+		Color slidercolor=grayed?Font.FindFontColor("DarkGray"):Font.FindFontColor(gameinfo.mSliderColor);
+
 		String formater = String.format("%%.%df", fracdigits);	// The format function cannot do the '%.*f' syntax.
 		String textbuf;
 		double range;
@@ -24,10 +29,10 @@ class OptionMenuItemReverseSlider : OptionMenuItemSlider{
 
 		if (!mSliderShort) {
 			Menu.DrawConText(Font.CR_WHITE, x, cy, "\x10\x11\x11\x11\x11\x11\x11\x11\x11\x11\x11\x12");
-			Menu.DrawConText(Font.FindFontColor(gameinfo.mSliderColor), x + int((5 + ((ccur * 78) / range)) * CleanXfac_1), cy, "\x13");
+			Menu.DrawConText(slidercolor, x + int((5 + ((ccur * 78) / range)) * CleanXfac_1), cy, "\x13");
 		}else{
 			Menu.DrawConText(Font.CR_WHITE, x, cy, "\x10\x11\x11\x11\x11\x11\x12");
-			Menu.DrawConText(Font.FindFontColor(gameinfo.mSliderColor), x + int((5 + ((ccur * 38) / range)) * CleanXfac_1), cy, "\x13");
+			Menu.DrawConText(slidercolor, x + int((5 + ((ccur * 38) / range)) * CleanXfac_1), cy, "\x13");
 			right -= 5*8*CleanXfac_1;
 		}
 
@@ -86,5 +91,13 @@ class OptionMenuItemReverseSlider : OptionMenuItemSlider{
 			lm.SetFocus(self);
 		}
 		return true;
+	}
+
+	virtual bool isGrayed() {
+		return check != null && !check.GetInt();
+	}
+	
+	override bool Selectable() {
+		return !isGrayed();
 	}
 }
