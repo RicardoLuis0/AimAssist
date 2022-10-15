@@ -17,7 +17,7 @@ OptionValue "AimAssist_OnObstruction" {
 
 OptionMenu "AimAssistOptions" {
 	Title "Aim Assist"
-	StaticText "v0.7.5 by RicardoLuis0","Gold"
+	StaticText "v0.7.6-dev by RicardoLuis0","Gold"
 	StaticText ""
 	StaticText ""
 	Option "Aim Assist Enabled","AIM_ASSIST_ENABLED","OnOff"
@@ -108,22 +108,22 @@ OptionMenu "AimAssistAimOffset" {
 	StaticText "Whether to aim based on player height or monster height","DarkRed"
 	StaticText ""
 	CheckValSlider "Monster Plus Aim Offset","AIM_ASSIST_VERTICAL_PLUS_OFFSET_ENEMY",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",1,0
-	StaticText "Add this to aim height of enemy","DarkRed"
+	StaticText "Add this to aim height of the enemy","DarkRed"
 	StaticText ""
 	CheckValSlider "Monster Minus Aim Offset","AIM_ASSIST_VERTICAL_MINUS_OFFSET_ENEMY",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",1,0
-	StaticText "Subtract this from aim height of enemy","DarkRed"
+	StaticText "Subtract this from aim height of the enemy","DarkRed"
 	StaticText ""
 	CheckValSlider "Monster Height Multiplier","AIM_ASSIST_ENEMY_HEIGHT_MULT",0,1,0.1,1,"AIM_ASSIST_HEIGHT_MODE",1,0
 	StaticText "Multiply enemy height by this","DarkRed"
 	StaticText ""
 	CheckValSlider "Player Plus Aim Offset","AIM_ASSIST_VERTICAL_PLUS_OFFSET_PLAYER",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",0,0
-	StaticText "Add this to aim height of enemy","DarkRed"
+	StaticText "Add this to aim height of the player","DarkRed"
 	StaticText ""
 	CheckValSlider "Player Minus Aim Offset","AIM_ASSIST_VERTICAL_MINUS_OFFSET_PLAYER",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",0,0
-	StaticText "Subtract this from aim height of enemy","DarkRed"
+	StaticText "Subtract this from aim height of the player","DarkRed"
 	StaticText ""
 	CheckValSlider "Player Height Multiplier","AIM_ASSIST_PLAYER_HEIGHT_MULT",0,1,0.1,1,"AIM_ASSIST_HEIGHT_MODE",0,0
-	StaticText "Multiply enemy height by this","DarkRed"
+	StaticText "Multiply player height by this","DarkRed"
 	StaticText ""
 	CheckValSlider "Transition Start Distance","AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_START",0,5000,10,1,"AIM_ASSIST_HEIGHT_MODE",2,1
 	StaticText "Distance to start transition between monster and player view target","DarkRed"
