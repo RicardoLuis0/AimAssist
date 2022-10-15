@@ -120,7 +120,7 @@ class AimAssistHandler : DisdainStaticEventHandler {
 		Vector3 hitloc=(0,0,0);
 		
 		//check straight ahead
-		[closest,closest_distance,hitloc]=playerData[pnum].doTrace(pawn,0,0,closest,closest_distance);
+		hitloc=playerData[pnum].doTrace(pawn,0,0,closest,closest_distance);
 		
 		double precision=playerData[pnum].precision;
 		double radial_precision=playerData[pnum].radial_precision;
@@ -130,7 +130,7 @@ class AimAssistHandler : DisdainStaticEventHandler {
 		//check in a circle around the direction player's looking
 		for(double i_a=precision;i_a<=max_angle;i_a+=precision){
 			for(double i_r=0;i_r<=360&&!(closest&&method==1);i_r+=radial_precision){
-				[closest,closest_distance,hitloc]=playerData[pnum].doTrace(pawn,i_a,i_r,closest,closest_distance);
+				hitloc=playerData[pnum].doTrace(pawn,i_a,i_r,closest,closest_distance);
 			}
 		}
 		//if there was an enemy found
@@ -219,17 +219,21 @@ class AimAssistHandler : DisdainStaticEventHandler {
 			//check rotation speed
 			if(abs(angle_diff)>rot_speed){
 				//if rotation speed is lower than difference, add/subtract rotation speed
-				pawn.A_SetAngle(pawn.angle+(angle_diff>0?rot_speed:-rot_speed),SPF_INTERPOLATE);
+				pawn.angle+=(angle_diff>0?rot_speed:-rot_speed);
+				pawn.player.cheats |= CF_INTERPVIEW;
 			}else{
 				//if rotation speed is higher than differece, set to target angle
-				pawn.A_SetAngle(target_angle,SPF_INTERPOLATE);
+				pawn.angle=target_angle;
+				pawn.player.cheats |= CF_INTERPVIEW;
 			}
 			if(abs(pitch_diff)>rot_speed){
 				//if rotation speed is lower than difference, add/subtract rotation speed
-				pawn.A_SetPitch(pawn.pitch+(pitch_diff>0?rot_speed:-rot_speed),SPF_INTERPOLATE);
+				pawn.pitch+=(pitch_diff>0?rot_speed:-rot_speed);
+				pawn.player.cheats |= CF_INTERPVIEW;
 			}else{
 				//if rotation speed is higher than differece, set to target pitch
-				pawn.A_SetPitch(target_pitch,SPF_INTERPOLATE);
+				pawn.pitch=target_pitch;
+				pawn.player.cheats |= CF_INTERPVIEW;
 			}
 			return true;
 		}else{

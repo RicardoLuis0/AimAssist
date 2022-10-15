@@ -1,3 +1,24 @@
+class DisdainMonsterTracer : LineTracer {
+	override ETraceStatus TraceCallback() {
+		if(results.HitType == TRACE_HitActor) {
+			return (results.hitActor is "DisdainMonster"
+					&& !results.hitActor.bFRIENDLY 
+					&& !results.hitActor.bCORPSE)
+						? TRACE_Stop
+						: TRACE_Skip;
+		} else if(results.HitType == TRACE_HitWall){
+			return (results.hitLine.sidedef[0] == null
+					|| results.hitLine.sidedef[1] == null
+					|| (results.hitLine.flags &
+							(Line.ML_BLOCKING | Line.ML_BLOCKEVERYTHING | Line.ML_BLOCKHITSCAN))
+					|| results.tier != TIER_Middle)
+						? TRACE_Stop
+						: TRACE_Skip;
+		}
+		return TRACE_Stop;
+	}
+}
+
 class AimAssistPlayerData {
 	bool enabled;//if assist is enabled or not
 
@@ -106,41 +127,39 @@ class AimAssistPlayerData {
 		}
 	}
 	//do linetrace and get results
-	play Actor,double,Vector3 doTrace(PlayerPawn a,double i_angle,double i_rotation,Actor closest,double closest_distance){
-		FLineTraceData t;
-		Vector3 hitloc=(0,0,0);
-		//do a linetrace around i_a and i_r in a circle
-		if(a.LineTrace(a.angle+(sin(i_rotation)*i_angle),			//trace angle
-							max_distance,							//trace max distance
-							a.pitch+(cos(i_rotation)*i_angle),		//trace pitch
-							TRF_NOSKY,								//trace flags
-							a.viewheight*a.player.crouchfactor,		//trace height
-							data:t									//output struct
+	play Vector3 doTrace(PlayerPawn a,double i_angle,double i_rotation,out Actor closest,out double closest_distance){
+		
+		let t = new("DisdainMonsterTracer");
+		
+		let angle = a.angle+(sin(i_rotation)*i_angle);
+		let pitch = a.pitch+(cos(i_rotation)*i_angle);
+		
+		Vector3 dir = (cos(pitch) * cos(angle), cos(pitch) * sin(angle), -sin(pitch));
+		
+		if(t.trace(
+			a.pos + (0, 0, a.viewheight * a.player.crouchfactor),
+			a.curSector,
+			dir,
+			max_distance,
+			TRACE_NoSky
 		)){
-			if(t.hitType==TRACE_HitActor){//if hit is an actor
-				
-				if(t.hitActor.bISMONSTER&&!t.hitActor.bFRIENDLY&&!t.hitActor.bCORPSE){//if hit is a monster and not friendly
-					if(!closest||a.Distance3D(t.HitActor)>closest_distance){//if it's closer than last hit
-						//change this as new closest
-						closest=t.HitActor;
-						closest_distance=a.Distance3D(t.HitActor);
-						hitloc=t.HitLocation;
-					}
-					if(debug_traces){
-						let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
-						a.A_SpawnParticle("#FF0000",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);
-					}
-				} else if (debug_traces) {
-					let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
-					a.A_SpawnParticle("#FFFF00",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);
+			if(t.results.hitType==TRACE_HitActor){//if hit is an actor
+				if(debug_traces){
+					let hitDist = level.Vec3Diff(a.pos,t.results.hitPos).length();
+					a.A_SpawnParticle("#FF0000",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.results.hitPos.x - a.pos.x,t.results.hitPos.y - a.pos.y,t.results.hitPos.z - a.pos.z);
+				}
+				if(!closest||a.Distance3D(t.results.HitActor)>closest_distance){//if it's closer than last hit
+					//change this as new closest
+					closest=t.results.HitActor;
+					closest_distance=a.Distance3D(t.results.HitActor);
+					return t.results.hitPos;
 				}
 			} else if (debug_traces) {
-				
-				let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
-				a.A_SpawnParticle("#00FF00",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);
+				let hitDist = level.Vec3Diff(a.pos,t.results.hitPos).length();
+				a.A_SpawnParticle("#00FF00",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.results.hitPos.x - a.pos.x,t.results.hitPos.y - a.pos.y,t.results.hitPos.z - a.pos.z);
 			}
 		}
-		return closest,closest_distance,hitloc;
+		return (0,0,0);
 	}
 	
 	bool aimEnabled(){
