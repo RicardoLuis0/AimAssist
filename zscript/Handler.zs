@@ -244,7 +244,7 @@ class AimAssistHandler : DisdainStaticEventHandler {
 	override void WorldTick(){
 		//if no keys are held and it's enabled, or keys are held and it's disabled, run the aim assist
 		for(int i=0;i<MAXPLAYERS;i++){
-			if(playeringame[i]){
+			if(playeringame[i] && (players[i].mo.FindInventory("DisdainCameraAnimation",true) == null)){
 				if(!doAim(i)||playerData[i].always_recenter){
 					playerData[i].doRecenter(players[i].mo);
 				}
