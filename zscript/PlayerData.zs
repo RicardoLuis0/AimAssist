@@ -115,7 +115,7 @@ class AimAssistPlayerData {
 							data:t									//output struct
 		)){
 			if(t.hitType==TRACE_HitActor){//if hit is an actor
-				if(t.hitActor.bISMONSTER&&!t.hitActor.bFRIENDLY){//if hit is a monster and not friendly
+				if(t.hitActor.bISMONSTER&&!t.hitActor.bFRIENDLY&&!t.hitActor.bCORPSE){//if hit is a monster and not friendly
 					if(!closest||a.Distance3D(t.HitActor)>closest_distance){//if it's closer than last hit
 						//change this as new closest
 						closest=t.HitActor;
