@@ -36,6 +36,8 @@ class AimAssistPlayerData {
 	
 	bool always_recenter;
 	
+	bool debug_traces;
+	
 	void UpdateCVARs(int pnum){
 		PlayerInfo player=players[pnum];
 		enabled=CVAR.GetCVar("AIM_ASSIST_ENABLED",player).getBool();
@@ -67,6 +69,7 @@ class AimAssistPlayerData {
 		mIsEnabled=CVAR.GetCVar("rc_enabled",player).getBool();
 		always_recenter=CVAR.GetCVar("rc_always_enabled",player).getBool();
 		mStep=CVAR.GetCVar("rc_step",player).getFloat();
+		debug_traces=CVAR.GetCVar("AIM_ASSIST_TRACE_DEBUG",player).getBool();
 	}
 	
 	float lerp(float v0,float v1,float t){
@@ -115,6 +118,7 @@ class AimAssistPlayerData {
 							data:t									//output struct
 		)){
 			if(t.hitType==TRACE_HitActor){//if hit is an actor
+				
 				if(t.hitActor.bISMONSTER&&!t.hitActor.bFRIENDLY&&!t.hitActor.bCORPSE){//if hit is a monster and not friendly
 					if(!closest||a.Distance3D(t.HitActor)>closest_distance){//if it's closer than last hit
 						//change this as new closest
@@ -122,7 +126,18 @@ class AimAssistPlayerData {
 						closest_distance=a.Distance3D(t.HitActor);
 						hitloc=t.HitLocation;
 					}
+					if(debug_traces){
+						let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
+						a.A_SpawnParticle("#FF0000",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);
+					}
+				} else if (debug_traces) {
+					let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
+					a.A_SpawnParticle("#FFFF00",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);
 				}
+			} else if (debug_traces) {
+				
+				let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
+				a.A_SpawnParticle("#00FF00",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);
 			}
 		}
 		return closest,closest_distance,hitloc;
