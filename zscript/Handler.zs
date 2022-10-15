@@ -1,4 +1,4 @@
-class AimAssistHandler:StaticEventHandler{
+class AimAssistHandler : DisdainStaticEventHandler {
 
 	bool mark;//if to display markers or not
 
