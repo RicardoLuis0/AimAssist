@@ -162,6 +162,9 @@ OptionMenu "AimAssistDebugOptions" {
 	Option "Aim Debug Marker","AIM_ASSIST_DEBUG_MARKER","OnOff"
 	StaticText "Show markers for current aim","DarkRed"
 	StaticText ""
+	Option "Trace Debug","AIM_ASSIST_TRACE_DEBUG","OnOff"
+	StaticText "Show the traces being fired","DarkRed"
+	StaticText ""
 }
 
 AddListMenu "DisdainOptions" after "DisdainMultiplayerOptions" {
