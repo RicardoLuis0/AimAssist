@@ -30,7 +30,7 @@
 //  performance
 // -----------
 
-	User Float cl_aim_assist_precision = 0.1;
+	User Float cl_aim_assist_precision = 0.5;
 	User Float cl_aim_assist_radial_precision = 30;
 	
 	User Bool cl_aim_assist_check_for_obstacles = true;
