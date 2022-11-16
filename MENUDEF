@@ -138,20 +138,20 @@ OptionMenu "AimAssistPerformanceOptions" {
 	StaticText ""
 	Option "Check for Obstacles","cl_aim_assist_check_for_obstacles","OnOff"
 	StaticText "Check if there are obstructions between aim and enemy","DarkRed"
-	StaticText "Disable to increases performance","DarkRed"
+	StaticText "Disable to increase performance","DarkRed"
 	StaticText ""
 	Option "On Obstruction","cl_aim_assist_on_obstruction","AimAssist_OnObstruction","cl_aim_assist_check_for_obstacles"
 	StaticText "Behavior on obstruction","DarkRed"
 	StaticText ""
 	ReverseSlider "Angle Precision","cl_aim_assist_precision",0.1,5,0.1
 	StaticText "Assist checks in increments of this","DarkRed"
-	StaticText "Lower to increases performance","DarkRed"
+	StaticText "Lower to increase performance","DarkRed"
 	StaticText ""
 	ReverseSlider "Radial Precision","cl_aim_assist_radial_precision",15,90,5
 	StaticText "Radial check by this, for example,","DarkRed"
 	StaticText "90 would be a straight '+',","DarkRed"
 	StaticText "45 is '+' and 'x', etc","DarkRed"
-	StaticText "Lower to increases performance","DarkRed"
+	StaticText "Lower to increase performance","DarkRed"
 }
 
 OptionMenu "AimAssistDebugOptions" {
