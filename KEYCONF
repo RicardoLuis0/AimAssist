@@ -1,0 +1,2 @@
+alias +AimAssistToggleHold "netevent AimAssistToggleHoldDown"
+alias -AimAssistToggleHold "netevent AimAssistToggleHoldUp"

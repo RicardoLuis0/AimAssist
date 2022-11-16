@@ -266,45 +266,18 @@ class AimAssistHandler:StaticEventHandler{
 			//toggle key pressed
 			playerData[e.player].enabled=!playerData[e.player].enabled;
 			if(e.player==consoleplayer){
-				CVAR.getCVar("AIM_ASSIST_ENABLED",players[e.player]).setBool(playerData[e.player].enabled);
+				CVAR.getCVar("cl_aim_assist_enabled",players[e.player]).setBool(playerData[e.player].enabled);
 				console.printf("Aim Assist "..(playerData[e.player].enabled?"On":"Off"));
 			}
 		}else if(e.name=="AimAssistCenterView"){
 			//center view
 			if(players[e.player].mo)players[e.player].mo.A_SetPitch(0,SPF_INTERPOLATE);
-		}else if(e.name=="AimAssistHoldKey1Down"){
-			//toggle hold key1 pressed
-			playerData[e.player].hold1=true;
-		}else if(e.name=="AimAssistHoldKey2Down"){
-			//toggle hold key2 pressed
-			playerData[e.player].hold2=true;
-		}else if(e.name=="AimAssistHoldKey1Up"){
-			//toggle hold key1 released
-			playerData[e.player].hold1=false;
-		}else if(e.name=="AimAssistHoldKey2Up"){
-			//toggle hold key2 released
-			playerData[e.player].hold2=false;
+		}else if(e.name=="AimAssistToggleHoldDown"){
+			//key held
+			playerData[e.player].hold++;
+		}else if(e.name=="AimAssistToggleHoldUp"){
+			//key released
+			playerData[e.player].hold--;
 		}
-	}
-	
-	override bool InputProcess(InputEvent e){
-		if(e.type==InputEvent.Type_KeyDown){
-			if(e.keyScan==playerData[consoleplayer].key1){
-				//key 1 was pressed, send event
-				EventHandler.SendNetworkEvent("AimAssistHoldKey1Down");
-			}else if(e.keyScan==playerData[consoleplayer].key2){
-				//key 2 was pressed, send event
-				EventHandler.SendNetworkEvent("AimAssistHoldKey2Down");
-			}
-		}else if(e.type==InputEvent.Type_KeyUp){
-			if(e.keyScan==playerData[consoleplayer].key1){
-				//key 1 was released, send event
-				EventHandler.SendNetworkEvent("AimAssistHoldKey1Up");
-			}else if(e.keyScan==playerData[consoleplayer].key2){
-				//key 2 was released, send event
-				EventHandler.SendNetworkEvent("AimAssistHoldKey2Up");
-			}
-		}
-		return false;
 	}
 }

@@ -11,12 +11,8 @@ class AimAssistPlayerData {
 
 	bool check_obstacles;//if to check for obstacles before rotating
 
-	int key1;//toggle hold key 1
-	int key2;//toggle hold key 2
-
-	bool hold1;//if key 1 is being held
-	bool hold2;//if key 2 is being held
-
+	int hold;
+	
 	float enemy_heightadd;
 	float enemy_heightsub;
 	float enemy_heightmult;
@@ -40,36 +36,28 @@ class AimAssistPlayerData {
 	
 	void UpdateCVARs(int pnum){
 		PlayerInfo player=players[pnum];
-		enabled=CVAR.GetCVar("AIM_ASSIST_ENABLED",player).getBool();
-		max_angle=CVAR.GetCVar("AIM_ASSIST_ANGLE_MAX",player).getFloat();
-		precision=CVAR.GetCVar("AIM_ASSIST_PRECISION",player).getFloat();
-		radial_precision=CVAR.GetCVar("AIM_ASSIST_RADIAL_PRECISION",player).getFloat();
-		max_distance=CVAR.GetCVar("AIM_ASSIST_MAX_DIST",player).getFloat();
-		rot_speed=CVAR.GetCVar("AIM_ASSIST_ROT_SPEED",player).getFloat();
-		method=CVAR.GetCVar("AIM_ASSIST_METHOD",player).getInt();
-		check_obstacles=CVAR.GetCVar("AIM_ASSIST_CHECK_FOR_OBSTACLES",player).getBool();
-		int key1_old=key1;
-		int key2_old=key2;
-		int hold1_old=hold1;
-		int hold2_old=hold2;
-		key1=CVAR.GetCVar("AIM_ASSIST_HOLD_KEY_1",player).getInt();
-		key2=CVAR.GetCVar("AIM_ASSIST_HOLD_KEY_2",player).getInt();
-		if(key1!=key1_old)hold1=(key1==key2_old?hold2_old:false);
-		if(key2!=key2_old)hold2=(key2==key1_old?hold1_old:false);
-		enemy_heightadd=CVAR.GetCVar("AIM_ASSIST_VERTICAL_PLUS_OFFSET_ENEMY",player).getFloat();
-		enemy_heightsub=CVAR.GetCVar("AIM_ASSIST_VERTICAL_MINUS_OFFSET_ENEMY",player).getFloat();
-		enemy_heightmult=CVAR.GetCVar("AIM_ASSIST_ENEMY_HEIGHT_MULT",player).getFloat();
-		player_heightadd=CVAR.GetCVar("AIM_ASSIST_VERTICAL_PLUS_OFFSET_PLAYER",player).getFloat();
-		player_heightsub=CVAR.GetCVar("AIM_ASSIST_VERTICAL_MINUS_OFFSET_PLAYER",player).getFloat();
-		player_heightmult=CVAR.GetCVar("AIM_ASSIST_PLAYER_HEIGHT_MULT",player).getFloat();
-		aim_height_mode=CVAR.GetCVar("AIM_ASSIST_HEIGHT_MODE",player).getInt();
-		transition_start=CVAR.GetCVar("AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_START",player).getFloat();
-		transition_end=CVAR.GetCVar("AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_END",player).getFloat();
-		on_obstruction=CVAR.GetCVar("AIM_ASSIST_ON_OBSTRUCTION",player).getInt();
-		mIsEnabled=CVAR.GetCVar("rc_enabled",player).getBool();
-		always_recenter=CVAR.GetCVar("rc_always_enabled",player).getBool();
-		mStep=CVAR.GetCVar("rc_step",player).getFloat();
-		debug_traces=CVAR.GetCVar("AIM_ASSIST_TRACE_DEBUG",player).getBool();
+		enabled=CVAR.GetCVar("cl_aim_assist_enabled",player).getBool();
+		max_angle=CVAR.GetCVar("cl_aim_assist_angle_max",player).getFloat();
+		precision=CVAR.GetCVar("cl_aim_assist_precision",player).getFloat();
+		radial_precision=CVAR.GetCVar("cl_aim_assist_radial_precision",player).getFloat();
+		max_distance=CVAR.GetCVar("cl_aim_assist_max_dist",player).getFloat();
+		rot_speed=CVAR.GetCVar("cl_aim_assist_rot_speed",player).getFloat();
+		method=CVAR.GetCVar("cl_aim_assist_method",player).getInt();
+		check_obstacles=CVAR.GetCVar("cl_aim_assist_check_for_obstacles",player).getBool();
+		enemy_heightadd=CVAR.GetCVar("cl_aim_assist_vertical_plus_offset_enemy",player).getFloat();
+		enemy_heightsub=CVAR.GetCVar("cl_aim_assist_vertical_minus_offset_enemy",player).getFloat();
+		enemy_heightmult=CVAR.GetCVar("cl_aim_assist_enemy_height_mult",player).getFloat();
+		player_heightadd=CVAR.GetCVar("cl_aim_assist_vertical_plus_offset_player",player).getFloat();
+		player_heightsub=CVAR.GetCVar("cl_aim_assist_vertical_minus_offset_player",player).getFloat();
+		player_heightmult=CVAR.GetCVar("cl_aim_assist_player_height_mult",player).getFloat();
+		aim_height_mode=CVAR.GetCVar("cl_aim_assist_height_mode",player).getInt();
+		transition_start=CVAR.GetCVar("cl_aim_assist_height_mode_transition_distance_start",player).getFloat();
+		transition_end=CVAR.GetCVar("cl_aim_assist_height_mode_transition_distance_end",player).getFloat();
+		on_obstruction=CVAR.GetCVar("cl_aim_assist_on_obstruction",player).getInt();
+		debug_traces=CVAR.GetCVar("cl_aim_assist_trace_debug",player).getBool();
+		mIsEnabled=CVAR.GetCVar("cl_recenter_enabled",player).getBool();
+		mStep=CVAR.GetCVar("cl_recenter_step",player).getFloat();
+		always_recenter=CVAR.GetCVar("cl_recenter_always_enabled",player).getBool();
 	}
 	
 	float lerp(float v0,float v1,float t){
@@ -144,7 +132,7 @@ class AimAssistPlayerData {
 	}
 	
 	bool aimEnabled(){
-		return (enabled&&!(hold1||hold2))||(!enabled&&(hold1||hold2));
+		return enabled == !hold;
 	}
 	
 	/* Copyright Alexander Kromm (mmaulwurff@gmail.com) 2020-2021 */

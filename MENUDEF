@@ -15,12 +15,15 @@ OptionValue "AimAssist_OnObstruction" {
 	2,"Target Closest"
 }
 
-OptionMenu "AimAssistOptions" {
+OptionMenu "AimAssistMenu" {
 	Title "Aim Assist"
 	StaticText "v0.7.6-dev by RicardoLuis0","Gold"
 	StaticText ""
+	Command "Update Settings (Ingame)","netevent AimAssistUpdateCVARs"
 	StaticText ""
-	Option "Aim Assist Enabled","AIM_ASSIST_ENABLED","OnOff"
+	StaticText "---","Gold"
+	StaticText ""
+	Option "Aim Assist Enabled","cl_aim_assist_enabled","OnOff"
 	StaticText ""
 	StaticText "---","Gold"
 	StaticText ""
@@ -28,11 +31,7 @@ OptionMenu "AimAssistOptions" {
 	StaticText ""
 	StaticText "---","Gold"
 	StaticText ""
-	Submenu "Recenter Configuration","AimAssistRecenterConfiguration"
-	StaticText ""
-	StaticText "---","Gold"
-	StaticText ""
-	Submenu "Configuration","AimAssistConfiguration"
+	Submenu "Options","AimAssistBasicOptions"
 	StaticText ""
 	StaticText "---","Gold"
 	StaticText ""
@@ -40,11 +39,11 @@ OptionMenu "AimAssistOptions" {
 	StaticText ""
 	StaticText "---","Gold"
 	StaticText ""
-	Submenu "Debug Options","AimAssistDebugOptions"
+	Submenu "Recenter Configuration","AimAssistRecenterOptions"
 	StaticText ""
 	StaticText "---","Gold"
 	StaticText ""
-	Command "Update Settings (Ingame)","netevent AimAssistUpdateCVARs"
+	Submenu "Debug Options","AimAssistDebugOptions"
 }
 
 OptionMenu "AimAssistControls" {
@@ -56,7 +55,7 @@ OptionMenu "AimAssistControls" {
 	StaticText ""
 	Control "Toggle Key","netevent AimAssistToggle"
 	StaticText ""
-	CVARControl "Hold Toggle Key","AIM_ASSIST_HOLD_KEY_1","AIM_ASSIST_HOLD_KEY_2"
+	Control "Hold Toggle Key","+AimAssistToggleHold"
 	StaticText ""
 }
 
@@ -64,71 +63,71 @@ AddOptionMenu "CustomizeControls" after "ChatControlsMenu" {
 	Submenu "Aim Assist Mod","AimAssistControls"
 }
 
-OptionMenu "AimAssistConfiguration" {
-	Title "Aim Assist Configuration"
+OptionMenu "AimAssistBasicOptions" {
+	Title "Aim Assist Options"
 	StaticText ""
 	StaticText ""
-	Submenu "Aim Offset","AimAssistAimOffset"
+	Submenu "Aim Height Offset Options","AimAssistAimHeightOffset"
 	StaticText ""
-	Slider "Max Assist Angle","AIM_ASSIST_ANGLE_MAX",1,15,0.5
+	Slider "Max Assist Angle","cl_aim_assist_angle_max",1,15,0.5
 	StaticText "Max Angle for Aim Assist","DarkRed"
 	StaticText "Lower to increases performance","DarkRed"
 	StaticText ""
-	Slider "Max Assist Distance","AIM_ASSIST_MAX_DIST",100,5000,100
+	Slider "Max Assist Distance","cl_aim_assist_max_dist",100,5000,100
 	StaticText "Max Distance for Aim Assist","DarkRed"
 	StaticText "Lower to increases performance","DarkRed"
 	StaticText ""
-	Slider "Assist Intensity","AIM_ASSIST_ROT_SPEED",0.1,5,0.1
+	Slider "Assist Intensity","cl_aim_assist_rot_speed",0.1,5,0.1
 	StaticText "Intensity in angle per tick for Aim Assist","DarkRed"
 	StaticText "Lower to decrease assist force","DarkRed"
 	StaticText ""
-	Option "Targeting Method","AIM_ASSIST_METHOD","AimAssist_AssistMethods"
+	Option "Targeting Method","cl_aim_assist_method","AimAssist_AssistMethods"
 	StaticText "Target Selection Method","DarkRed"
 	StaticText "\"Closer to crosshair\" has better performance","DarkRed"
 }
 
-OptionMenu "AimAssistRecenterConfiguration" {
-	Title "Recenter Configuration"
+OptionMenu "AimAssistRecenterOptions" {
+	Title "Recenter Options"
 	StaticText "Recenter: Copyright Alexander Kromm (mmaulwurff@gmail.com) 2020-2021","Gold"
 	StaticText ""
-	Option "Enabled","rc_enabled","OnOff"
+	Option "Enabled","cl_recenter_enabled","OnOff"
 	StaticText ""
-	Slider "Step","rc_step",0.1,5,0.1
+	Slider "Step","cl_recenter_step",0.1,5,0.1
 	StaticText ""
-	Option "Always Enabled","rc_always_enabled","OnOff"
+	Option "Always Enabled","cl_recenter_always_enabled","OnOff"
 	StaticText "Always run Recenter, even while tracking an enemy. This is not recommended to be enabled,","DarkRed"
 	StaticText "as it can cause both mods to try to move the player aim in opposite directions","DarkRed"
 }
 
-OptionMenu "AimAssistAimOffset" {
-	Title "Aim Offset Configuration"
+OptionMenu "AimAssistAimHeightOffset" {
+	Title "Aim Height Offset Options"
 	StaticText ""
 	StaticText ""
-	Option "Aim Method","AIM_ASSIST_HEIGHT_MODE","AimAssist_AimMethods"
+	Option "Aim Method","cl_aim_assist_height_mode","AimAssist_AimMethods"
 	StaticText "Whether to aim based on player height or monster height","DarkRed"
 	StaticText ""
-	CheckValSlider "Monster Plus Aim Offset","AIM_ASSIST_VERTICAL_PLUS_OFFSET_ENEMY",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",1,0
+	CheckValSlider "Monster Plus Aim Offset","cl_aim_assist_vertical_plus_offset_enemy",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",1,0
 	StaticText "Add this to aim height of the enemy","DarkRed"
 	StaticText ""
-	CheckValSlider "Monster Minus Aim Offset","AIM_ASSIST_VERTICAL_MINUS_OFFSET_ENEMY",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",1,0
+	CheckValSlider "Monster Minus Aim Offset","cl_aim_assist_vertical_minus_offset_enemy",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",1,0
 	StaticText "Subtract this from aim height of the enemy","DarkRed"
 	StaticText ""
-	CheckValSlider "Monster Height Multiplier","AIM_ASSIST_ENEMY_HEIGHT_MULT",0,1,0.1,1,"AIM_ASSIST_HEIGHT_MODE",1,0
+	CheckValSlider "Monster Height Multiplier","cl_aim_assist_enemy_height_mult",0,1,0.1,1,"AIM_ASSIST_HEIGHT_MODE",1,0
 	StaticText "Multiply enemy height by this","DarkRed"
 	StaticText ""
-	CheckValSlider "Player Plus Aim Offset","AIM_ASSIST_VERTICAL_PLUS_OFFSET_PLAYER",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",0,0
+	CheckValSlider "Player Plus Aim Offset","cl_aim_assist_vertical_plus_offset_player",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",0,0
 	StaticText "Add this to aim height of the player","DarkRed"
 	StaticText ""
-	CheckValSlider "Player Minus Aim Offset","AIM_ASSIST_VERTICAL_MINUS_OFFSET_PLAYER",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",0,0
+	CheckValSlider "Player Minus Aim Offset","cl_aim_assist_vertical_minus_offset_player",0,64,0.5,1,"AIM_ASSIST_HEIGHT_MODE",0,0
 	StaticText "Subtract this from aim height of the player","DarkRed"
 	StaticText ""
-	CheckValSlider "Player Height Multiplier","AIM_ASSIST_PLAYER_HEIGHT_MULT",0,1,0.1,1,"AIM_ASSIST_HEIGHT_MODE",0,0
+	CheckValSlider "Player Height Multiplier","cl_aim_assist_player_height_mult",0,1,0.1,1,"AIM_ASSIST_HEIGHT_MODE",0,0
 	StaticText "Multiply player height by this","DarkRed"
 	StaticText ""
-	CheckValSlider "Transition Start Distance","AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_START",0,5000,10,1,"AIM_ASSIST_HEIGHT_MODE",2,1
+	CheckValSlider "Transition Start Distance","cl_aim_assist_height_mode_transition_distance_start",0,5000,10,1,"AIM_ASSIST_HEIGHT_MODE",2,1
 	StaticText "Distance to start transition between monster and player view target","DarkRed"
 	StaticText ""
-	CheckValSlider "Transition End Distance","AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_END",0,5000,10,1,"AIM_ASSIST_HEIGHT_MODE",2,1
+	CheckValSlider "Transition End Distance","cl_aim_assist_height_mode_transition_distance_end",0,5000,10,1,"AIM_ASSIST_HEIGHT_MODE",2,1
 	StaticText "Distance to end transition between monster and player view target","DarkRed"
 	StaticText ""
 }
@@ -137,18 +136,18 @@ OptionMenu "AimAssistPerformanceOptions" {
 	Title "Aim Assist Performance Options"
 	StaticText ""
 	StaticText ""
-	Option "Check for Obstacles","AIM_ASSIST_CHECK_FOR_OBSTACLES","OnOff"
+	Option "Check for Obstacles","cl_aim_assist_check_for_obstacles","OnOff"
 	StaticText "Check if there are obstructions between aim and enemy","DarkRed"
 	StaticText "Disable to increases performance","DarkRed"
 	StaticText ""
-	Option "On Obstruction","AIM_ASSIST_ON_OBSTRUCTION","AimAssist_OnObstruction","AIM_ASSIST_CHECK_FOR_OBSTACLES"
+	Option "On Obstruction","cl_aim_assist_on_obstruction","AimAssist_OnObstruction","cl_aim_assist_check_for_obstacles"
 	StaticText "Behavior on obstruction","DarkRed"
 	StaticText ""
-	ReverseSlider "Angle Precision","AIM_ASSIST_PRECISION",0.1,5,0.1
+	ReverseSlider "Angle Precision","cl_aim_assist_precision",0.1,5,0.1
 	StaticText "Assist checks in increments of this","DarkRed"
 	StaticText "Lower to increases performance","DarkRed"
 	StaticText ""
-	ReverseSlider "Radial Precision","AIM_ASSIST_RADIAL_PRECISION",15,90,5
+	ReverseSlider "Radial Precision","cl_aim_assist_radial_precision",15,90,5
 	StaticText "Radial check by this, for example,","DarkRed"
 	StaticText "90 would be a straight '+',","DarkRed"
 	StaticText "45 is '+' and 'x', etc","DarkRed"
@@ -159,20 +158,20 @@ OptionMenu "AimAssistDebugOptions" {
 	Title "Aim Assist Debug Options"
 	StaticText ""
 	StaticText ""
-	Option "Aim Debug Marker","AIM_ASSIST_DEBUG_MARKER","OnOff"
+	Option "Aim Debug Marker","cl_aim_assist_debug_marker","OnOff"
 	StaticText "Show markers for current aim","DarkRed"
 	StaticText ""
-	Option "Trace Debug","AIM_ASSIST_TRACE_DEBUG","OnOff"
+	Option "Trace Debug","cl_aim_assist_trace_debug","OnOff"
 	StaticText "Show the traces being fired","DarkRed"
 	StaticText ""
 }
 
 AddOptionMenu "OptionsMenu"{
-    Submenu "Aim Assist Options", "AimAssistOptions"
+    Submenu "Aim Assist Mod", "AimAssistMenu"
     StaticText ""
 }
 
 AddOptionMenu "OptionsMenuSimple"{
-    Submenu "Aim Assist Options", "AimAssistOptions"
+    Submenu "Aim Assist Mod", "AimAssistMenu"
     StaticText ""
 }
