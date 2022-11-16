@@ -51,7 +51,7 @@ class AimAssistHandler:StaticEventHandler{
 		playerData[pnum].UpdateCVARs(pnum);
 		if(pnum==consoleplayer){
 			ClearMarkers();
-			mark=CVAR.GetCVar("AIM_ASSIST_DEBUG_MARKER",players[consoleplayer]).getBool();
+			mark=CVAR.GetCVar("cl_aim_assist_debug_marker",players[consoleplayer]).getBool();
 		}
 	}
 
