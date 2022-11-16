@@ -19,21 +19,13 @@ OptionMenu "AimAssistMenu" {
 	Title "Aim Assist"
 	StaticText "v0.8.0-dev by RicardoLuis0","Gold"
 	StaticText ""
-	Command "Update Settings (Ingame)","netevent AimAssistUpdateCVARs"
-	StaticText ""
-	StaticText "---","Gold"
-	StaticText ""
 	Option "Aim Assist Enabled","cl_aim_assist_enabled","OnOff"
 	StaticText ""
 	StaticText "---","Gold"
 	StaticText ""
 	Submenu "Controls","AimAssistControls"
 	StaticText ""
-	StaticText "---","Gold"
-	StaticText ""
 	Submenu "Options","AimAssistBasicOptions"
-	StaticText ""
-	StaticText "---","Gold"
 	StaticText ""
 	Submenu "Performance Options","AimAssistPerformanceOptions"
 	StaticText ""
@@ -44,6 +36,8 @@ OptionMenu "AimAssistMenu" {
 	StaticText "---","Gold"
 	StaticText ""
 	Submenu "Debug Options","AimAssistDebugOptions"
+	StaticText ""
+	Command "Update Settings (Ingame)","netevent AimAssistUpdateCVARs"
 }
 
 OptionMenu "AimAssistControls" {
@@ -65,7 +59,6 @@ AddOptionMenu "CustomizeControls" after "ChatControlsMenu" {
 
 OptionMenu "AimAssistBasicOptions" {
 	Title "Aim Assist Options"
-	StaticText ""
 	StaticText ""
 	Submenu "Aim Height Offset Options","AimAssistAimHeightOffset"
 	StaticText ""
