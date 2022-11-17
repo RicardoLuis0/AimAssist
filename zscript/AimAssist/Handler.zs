@@ -161,7 +161,7 @@ class AimAssistHandler : StaticEventHandler{
 			let keys = presets.GetKeys();
 			let n = keys.keys.Size();
 			
-			let INVALID_KEY = preset_cvars.Size();
+			let PRESET_COUNT = preset_cvars.Size();
 			
 			for(uint i = 0; i < n; i++) {
 				bool invalid = false;
@@ -174,12 +174,12 @@ class AimAssistHandler : StaticEventHandler{
 					let obj_keys = obj.GetKeys();
 					let n = obj_keys.keys.Size();
 					Array<int> cvar_key_count;
-					cvar_key_count.Resize(preset_cvars.Size());
+					cvar_key_count.Resize(PRESET_COUNT);
 					for(uint i = 0; i < n; i++) {
 						let cvar_name = obj_keys.keys[i];
 						//int j = preset_cvars.Find(cvar_name);
 						int j = FindPresetCVarName(cvar_name);
-						if(j == INVALID_KEY) {
+						if(j == PRESET_COUNT) {
 							invalid = true;
 							console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' has an invalid CVar '"..cvar_name.."'");
 						} else {
@@ -188,6 +188,13 @@ class AimAssistHandler : StaticEventHandler{
 								invalid = true;
 								console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' CVar '"..cvar_name.."' has type '"..cvar_data.GetPrettyName().."', expected '"..preset_pretty_types[j].."'");
 							}
+						}
+					}
+					
+					for(uint i = 0; i < PRESET_COUNT; i++) {
+						if(cvar_key_count[i] == 0) {
+							invalid = true;
+							console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' is missing CVar '"..preset_cvars[i].."'");
 						}
 					}
 				}
