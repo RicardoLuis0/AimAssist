@@ -1,0 +1,12 @@
+OptionMenu "AimAssistRecenterOptions" {
+	Title "Recenter Options"
+	StaticText "Recenter: Copyright Alexander Kromm (mmaulwurff@gmail.com) 2020-2021","Gold"
+	StaticText ""
+	Option "Enabled","cl_recenter_enabled","OnOff"
+	StaticText ""
+	Slider "Step","cl_recenter_step",0.1,5,0.1
+	StaticText ""
+	Option "Always Enabled","cl_recenter_always_enabled","OnOff"
+	StaticText "Always run Recenter, even while tracking an enemy. This is not recommended to be enabled,","DarkRed"
+	StaticText "as it can cause both mods to try to move the player aim in opposite directions","DarkRed"
+}

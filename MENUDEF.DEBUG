@@ -1,0 +1,11 @@
+OptionMenu "AimAssistDebugOptions" {
+	Title "Aim Assist Debug Options"
+	StaticText ""
+	StaticText ""
+	Option "Aim Debug Marker","cl_aim_assist_debug_marker","OnOff"
+	StaticText "Show markers for current aim","DarkRed"
+	StaticText ""
+	Option "Trace Debug","cl_aim_assist_trace_debug","OnOff"
+	StaticText "Show the traces being fired","DarkRed"
+	StaticText ""
+}

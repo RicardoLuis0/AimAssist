@@ -1,0 +1,24 @@
+OptionValue "AimAssist_AssistMethods" {
+	1,"Closest to Crosshair"
+	0,"Closest to Player"
+}
+
+OptionMenu "AimAssistBasicOptions" {
+	Title "Aim Assist Options"
+	StaticText ""
+	Slider "Max Assist Angle","cl_aim_assist_angle_max",1,15,0.5
+	StaticText "Max Angle for Aim Assist","DarkRed"
+	StaticText "Lower to increases performance","DarkRed"
+	StaticText ""
+	Slider "Max Assist Distance","cl_aim_assist_max_dist",100,5000,100
+	StaticText "Max Distance for Aim Assist","DarkRed"
+	StaticText "Lower to increases performance","DarkRed"
+	StaticText ""
+	Slider "Assist Intensity","cl_aim_assist_rot_speed",0.1,5,0.1
+	StaticText "Intensity in angle per tick for Aim Assist","DarkRed"
+	StaticText "Lower to decrease assist force","DarkRed"
+	StaticText ""
+	Option "Targeting Method","cl_aim_assist_method","AimAssist_AssistMethods"
+	StaticText "Target Selection Method","DarkRed"
+	StaticText "\"Closer to crosshair\" has better performance","DarkRed"
+}

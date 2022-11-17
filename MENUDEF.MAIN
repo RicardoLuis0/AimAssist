@@ -1,0 +1,36 @@
+AddOptionMenu "OptionsMenu" {
+    Submenu "Aim Assist Mod", "AimAssistMenu"
+    StaticText ""
+}
+
+AddOptionMenu "OptionsMenuSimple" {
+    Submenu "Aim Assist Mod", "AimAssistMenu"
+    StaticText ""
+}
+
+OptionMenu "AimAssistMenu" {
+	Title "Aim Assist"
+	StaticText "v0.8.0-dev by RicardoLuis0","Gold"
+	StaticText ""
+	Option "Aim Assist Enabled","cl_aim_assist_enabled","OnOff"
+	StaticText ""
+	StaticText "---","Gold"
+	StaticText ""
+	Submenu "Setup Controls","AimAssistControls"
+	StaticText ""
+	Submenu "Basic Settings","AimAssistBasicOptions"
+	StaticText ""
+	Submenu "Aim Height Offset Settings","AimAssistAimHeightOffset"
+	StaticText ""
+	Submenu "Performance Settings","AimAssistPerformanceOptions"
+	StaticText ""
+	StaticText "---","Gold"
+	StaticText ""
+	Submenu "Recenter Settings","AimAssistRecenterOptions"
+	StaticText ""
+	StaticText "---","Gold"
+	StaticText ""
+	Submenu "Debug","AimAssistDebugOptions"
+	StaticText ""
+	Command "Update Settings (Ingame)","netevent AimAssistUpdateCVARs"
+}

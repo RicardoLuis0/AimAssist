@@ -77,6 +77,7 @@ class OptionMenuCheckSliderBase : OptionMenuSliderBase {
 	}
 
 }
+
 class OptionMenuItemCheckSlider : OptionMenuCheckSliderBase {
 	
 	CVar mCVar;
@@ -84,7 +85,7 @@ class OptionMenuItemCheckSlider : OptionMenuCheckSliderBase {
 	OptionMenuItemCheckSlider Init(String label, Name command, double min, double max, double step, int showval = 1, CVar graycheck = NULL)
 	{
 		Super.Init(label, min, max, step, showval, command, graycheck);
-		mCVar =CVar.FindCVar(command);
+		mCVar = CVar.FindCVar(command);
 		return self;
 	}
 
