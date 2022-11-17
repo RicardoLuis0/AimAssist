@@ -7,21 +7,34 @@ class AimAssist_JsonElement : AimAssist_JsonElementOrError abstract {
 
 class AimAssist_JsonNumber : AimAssist_JsonElement abstract {
 	abstract AimAssist_JsonNumber negate();
+	abstract double  getDouble();
+	abstract int getInt();
 }
 
 class AimAssist_JsonInt : AimAssist_JsonNumber {
 	int i;
+	
 	static AimAssist_JsonInt make(int i=0){
 		AimAssist_JsonInt ii=new("AimAssist_JsonInt");
 		ii.i=i;
 		return ii;
 	}
+	
 	override AimAssist_JsonNumber negate(){
 		i=-i;
 		return self;
 	}
+	
 	override string serialize(){
 		return ""..i;
+	}
+	
+	override double getDouble() {
+		return double(i);
+	}
+	
+	override int getInt() {
+		return i;
 	}
 }
 
@@ -38,6 +51,14 @@ class AimAssist_JsonDouble : AimAssist_JsonNumber {
 	}
 	override string serialize(){
 		return ""..d;
+	}
+	
+	override double getDouble() {
+		return d;
+	}
+	
+	override int getInt() {
+		return int(d);
 	}
 }
 
