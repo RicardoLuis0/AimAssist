@@ -125,4 +125,7 @@ class AimAssist_JsonObject : AimAssist_JsonElement {
 		s.AppendCharacter(AimAssist_JSON.CURLY_CLOSE);
 		return s;
 	}
+	override string GetPrettyName() {
+		return "Object";
+	}
 }

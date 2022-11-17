@@ -91,6 +91,47 @@ class AimAssistHandler : StaticEventHandler{
 			"AimAssist_JsonBool"	// cl_recenter_always_enabled
 	};
 	
+	
+	static const String preset_pretty_types[] = {
+		// -----------
+		//  base
+		// -----------
+			"Bool",	// cl_aim_assist_enabled
+			"Number",	// cl_aim_assist_angle_max
+			"Number",	// cl_aim_assist_max_dist
+			"Number",	// cl_aim_assist_rot_speed
+			"Number",	// cl_aim_assist_method
+		// -----------
+		//  aim height
+		// -----------
+			"Number",	// cl_aim_assist_height_mode
+			
+			"Number",	// cl_aim_assist_vertical_plus_offset_enemy
+			"Number",	// cl_aim_assist_vertical_minus_offset_enemy
+			"Number",	// cl_aim_assist_enemy_height_mult
+			
+			"Number",	// cl_aim_assist_vertical_plus_offset_player
+			"Number",	// cl_aim_assist_vertical_minus_offset_player
+			"Number",	// cl_aim_assist_player_height_mult
+			
+			"Number",	// cl_aim_assist_height_mode_transition_distance_start
+			"Number",	// cl_aim_assist_height_mode_transition_distance_end
+		// -----------
+		//  performance
+		// -----------
+			"Number",	// cl_aim_assist_precision
+			"Number",	// cl_aim_assist_radial_precision
+			
+			"Bool",	// cl_aim_assist_check_for_obstacles
+			"Number",	// cl_aim_assist_on_obstruction
+		// -----------
+		//  recenter
+		// -----------
+			"Bool",	// cl_recenter_enabled
+			"Number",	// cl_recenter_step
+			"Bool"	// cl_recenter_always_enabled
+	};
+	
 	int FindPresetCVarName(String cvar_name){
 		let n = preset_cvars.Size();
 		for(int i = 0; i < n; i++){
@@ -145,7 +186,7 @@ class AimAssistHandler : StaticEventHandler{
 							let cvar_data = obj.Get(cvar_name);
 							if(!(cvar_data is preset_cvar_types[j])){
 								invalid = true;
-								console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' CVar '"..cvar_name.."' has invalid type '"..cvar_data.GetClassName().."', expected '"..preset_cvar_types[j].GetClassName().."'");
+								console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' CVar '"..cvar_name.."' has type '"..cvar_data.GetPrettyName().."', expected '"..preset_pretty_types[j].."'");
 							}
 						}
 					}

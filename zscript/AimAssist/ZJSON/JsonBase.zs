@@ -3,12 +3,16 @@ class AimAssist_JsonElementOrError {
 
 class AimAssist_JsonElement : AimAssist_JsonElementOrError abstract {
 	abstract string serialize();
+	abstract string GetPrettyName();
 }
 
 class AimAssist_JsonNumber : AimAssist_JsonElement abstract {
 	abstract AimAssist_JsonNumber negate();
 	abstract double  getDouble();
 	abstract int getInt();
+	override string GetPrettyName() {
+		return "Number";
+	}
 }
 
 class AimAssist_JsonInt : AimAssist_JsonNumber {
@@ -72,6 +76,9 @@ class AimAssist_JsonBool : AimAssist_JsonElement {
 	override string serialize(){
 		return b?"true":"false";
 	}
+	override string GetPrettyName() {
+		return "Bool";
+	}
 }
 
 class AimAssist_JsonString : AimAssist_JsonElement {
@@ -84,6 +91,9 @@ class AimAssist_JsonString : AimAssist_JsonElement {
 	override string serialize(){
 		return AimAssist_JSON.serialize_string(s);
 	}
+	override string GetPrettyName() {
+		return "String";
+	}
 }
 
 class AimAssist_JsonNull : AimAssist_JsonElement {
@@ -92,6 +102,9 @@ class AimAssist_JsonNull : AimAssist_JsonElement {
 	}
 	override string serialize(){
 		return "null";
+	}
+	override string GetPrettyName() {
+		return "Null";
 	}
 }
 

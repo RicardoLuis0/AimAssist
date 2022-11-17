@@ -71,4 +71,7 @@ class AimAssist_JsonArray : AimAssist_JsonElement { // pretty much just a wrappe
 		s.AppendCharacter(AimAssist_JSON.SQUARE_CLOSE);
 		return s;
 	}
+	override string GetPrettyName() {
+		return "Array";
+	}
 }
