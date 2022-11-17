@@ -220,10 +220,12 @@ class AimAssist_JSON {
 			if(elem is "AimAssist_JsonError"){
 				return AimAssist_JsonError.make("On Object value '"..last_element.."', "..AimAssist_JsonError(elem).what);
 			}
-			obj.set(AimAssist_JsonString(key).s,AimAssist_JsonElement(elem));
+			if(!obj.insert(AimAssist_JsonString(key).s,AimAssist_JsonElement(elem))) {
+				return AimAssist_JsonError.make("On Object value '"..last_element.."', duplicate key");
+			}
 			skipWhitespace(data,i,len,line);
 			if(i>=len){
-				return AimAssist_JsonError.make("After Object value '"..last_element.."', expected ',', got EOF after element '"..last_element.."'");
+				return AimAssist_JsonError.make("After Object value '"..last_element.."', expected ',', got EOF");
 			}
 			[c,ii]=data.getNextCodePoint(i);
 			if(c!=COMMA){
