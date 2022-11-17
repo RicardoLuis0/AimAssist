@@ -1,4 +1,4 @@
-class AimAssistHandler:StaticEventHandler{
+class AimAssistHandler : StaticEventHandler{
 
 	bool mark;//if to display markers or not
 
@@ -8,10 +8,158 @@ class AimAssistHandler:StaticEventHandler{
 	AimAssistDebugMaker4 marker4;//obstruction marker
 
 	AimAssistPlayerData playerData[MAXPLAYERS];
-
+	
+	AimAssist_JsonObject presets;
+	
+	static const String preset_cvars[] = {
+		// -----------
+		//  base
+		// -----------
+			"cl_aim_assist_enabled",
+			"cl_aim_assist_angle_max",
+			"cl_aim_assist_max_dist",
+			"cl_aim_assist_rot_speed",
+			"cl_aim_assist_method",
+		// -----------
+		//  aim height
+		// -----------
+			"cl_aim_assist_height_mode",
+			
+			"cl_aim_assist_vertical_plus_offset_enemy",
+			"cl_aim_assist_vertical_minus_offset_enemy",
+			"cl_aim_assist_enemy_height_mult",
+			
+			"cl_aim_assist_vertical_plus_offset_player",
+			"cl_aim_assist_vertical_minus_offset_player",
+			"cl_aim_assist_player_height_mult",
+			
+			"cl_aim_assist_height_mode_transition_distance_start",
+			"cl_aim_assist_height_mode_transition_distance_end",
+		// -----------
+		//  performance
+		// -----------
+			"cl_aim_assist_precision",
+			"cl_aim_assist_radial_precision",
+			
+			"cl_aim_assist_check_for_obstacles",
+			"cl_aim_assist_on_obstruction",
+		// -----------
+		//  recenter
+		// -----------
+			"cl_recenter_enabled",
+			"cl_recenter_step",
+			"cl_recenter_always_enabled"
+	};
+	
+	static const Class<AimAssist_JsonElement> preset_cvar_types[] = {
+		// -----------
+		//  base
+		// -----------
+			"AimAssist_JsonBool",	// cl_aim_assist_enabled
+			"AimAssist_JsonNumber",	// cl_aim_assist_angle_max
+			"AimAssist_JsonNumber",	// cl_aim_assist_max_dist
+			"AimAssist_JsonNumber",	// cl_aim_assist_rot_speed
+			"AimAssist_JsonNumber",	// cl_aim_assist_method
+		// -----------
+		//  aim height
+		// -----------
+			"AimAssist_JsonNumber",	// cl_aim_assist_height_mode
+			
+			"AimAssist_JsonNumber",	// cl_aim_assist_vertical_plus_offset_enemy
+			"AimAssist_JsonNumber",	// cl_aim_assist_vertical_minus_offset_enemy
+			"AimAssist_JsonNumber",	// cl_aim_assist_enemy_height_mult
+			
+			"AimAssist_JsonNumber",	// cl_aim_assist_vertical_plus_offset_player
+			"AimAssist_JsonNumber",	// cl_aim_assist_vertical_minus_offset_player
+			"AimAssist_JsonNumber",	// cl_aim_assist_player_height_mult
+			
+			"AimAssist_JsonNumber",	// cl_aim_assist_height_mode_transition_distance_start
+			"AimAssist_JsonNumber",	// cl_aim_assist_height_mode_transition_distance_end
+		// -----------
+		//  performance
+		// -----------
+			"AimAssist_JsonNumber",	// cl_aim_assist_precision
+			"AimAssist_JsonNumber",	// cl_aim_assist_radial_precision
+			
+			"AimAssist_JsonBool",	// cl_aim_assist_check_for_obstacles
+			"AimAssist_JsonNumber",	// cl_aim_assist_on_obstruction
+		// -----------
+		//  recenter
+		// -----------
+			"AimAssist_JsonBool",	// cl_recenter_enabled
+			"AimAssist_JsonNumber",	// cl_recenter_step
+			"AimAssist_JsonBool"	// cl_recenter_always_enabled
+	};
+	
+	int FindPresetCVarName(String cvar_name){
+		let n = preset_cvars.Size();
+		for(int i = 0; i < n; i++){
+			if(cvar_name == preset_cvars[i]){
+				return i;
+			}
+		}
+		return n;
+	}
+	
 	override void OnRegister(){
 		for(int i=0;i<MAXPLAYERS;i++){
 			playerData[i]=new("AimAssistPlayerData");
+		}
+		let presetsOrError = AimAssist_JSON.parse(__aim_assist_user_presets_json);
+		if(!(presetsOrError is "AimAssist_JsonObject")){
+			if(presetsOrError is "AimAssist_JsonError"){
+				console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Presets CVar has invalid JSON data ("..(AimAssist_JsonError(presetsOrError).what).."), ignoring it");
+			} else {
+				console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Presets CVar is not a JSON Object, ignoring it");
+			}
+			presets = AimAssist_JsonObject.make();
+		} else {
+			Array<String> invalidKeys;
+			
+			presets = AimAssist_JsonObject(presetsOrError);
+			let keys = presets.GetKeys();
+			let n = keys.keys.Size();
+			
+			let INVALID_KEY = preset_cvars.Size();
+			
+			for(uint i = 0; i < n; i++) {
+				bool invalid = false;
+				let key = keys.keys[i];
+				let value = presets.Get(key);
+				if(!(value is "AimAssist_JsonObject")) {
+					console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' is not a JSON Object");
+				} else {
+					let obj = AimAssist_JsonObject(value);
+					let obj_keys = obj.GetKeys();
+					let n = obj_keys.keys.Size();
+					Array<int> cvar_key_count;
+					cvar_key_count.Resize(preset_cvars.Size());
+					for(uint i = 0; i < n; i++) {
+						let cvar_name = obj_keys.keys[i];
+						//int j = preset_cvars.Find(cvar_name);
+						int j = FindPresetCVarName(cvar_name);
+						if(j == INVALID_KEY) {
+							invalid = true;
+							console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' has an invalid CVar '"..cvar_name.."'");
+						} else {
+							let cvar_data = obj.Get(cvar_name);
+							if(!(cvar_data is preset_cvar_types[j])){
+								invalid = true;
+								console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' CVar '"..cvar_name.."' has invalid type '"..cvar_data.GetClassName().."', expected '"..preset_cvar_types[j].GetClassName().."'");
+							}
+						}
+					}
+				}
+				
+				if(invalid) {
+					console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' has errors, ignoring it");
+					invalidKeys.Push(key);
+				}
+			}
+			n = invalidKeys.Size();
+			for(uint i = 0; i < n; i++) {
+				presets.delete(invalidKeys[i]);
+			}
 		}
 	}
 
@@ -20,8 +168,8 @@ class AimAssistHandler:StaticEventHandler{
 		marker2=null;
 		marker3=null;
 		marker4=null;
-		for(int i=0;i<MAXPLAYERS;i++){
-			if(playeringame[i]){
+		for(int i=0;i<MAXPLAYERS;i++) {
+			if(playeringame[i]) {
 				UpdateCVARs(i);
 			}
 		}
