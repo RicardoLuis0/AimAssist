@@ -1,0 +1,38 @@
+OptionMenu "AimAssistPresetMenu" {
+	Title "Presets"
+	
+	Class "AimAssistPresetsMenu"
+	
+	AimAssistConfirmCommand "Reset to Default", "ResetToDefault", "", "Are you sure you want to reset to default settings?"
+	
+	Submenu "Built-in Presets", "AimAssistBuiltInPresets"
+	Submenu "User Presets", "AimAssistUserPresets"
+	Submenu "Save Current Preset", "AimAssistSaveUserPreset"
+	
+}
+
+OptionMenu "AimAssistUserPresets" {
+	
+	Title "User Presets"
+	
+	Class "AimAssistUserPresetsMenu"
+	
+}
+
+OptionMenu "AimAssistSaveUserPreset" {
+	Class "AimAssistSavePresetMenu"
+	StaticText ""
+	StaticText ""
+	StaticText ""
+	StaticText ""
+	StaticText ""
+	StaticText ""
+	StaticText ""
+	StaticText ""
+	StaticText ""
+	StaticText ""
+	StaticText ""
+	StaticText ""
+	TextField "Preset Name: ", "__aim_assist_save_preset_name"
+	AimAssistSaveUserPreset
+}

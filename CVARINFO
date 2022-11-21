@@ -47,7 +47,8 @@
 //  presets
 // -----------
 
-	NoSave String __aim_assist_user_presets_json = "null";
+	NoSave String __aim_assist_user_presets_json = "{}";
+	NoSave NoArchive String __aim_assist_save_preset_name = "";
 
 // -----------
 //  recenter

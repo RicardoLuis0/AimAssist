@@ -8,19 +8,33 @@ class AimAssist_JsonObjectElement {
 		elem.e=e;
 		return elem;
 	}
+	override void OnDestroy(){
+		console.printf("AimAssist_JsonObjectElement Being destroyed with key = "..key);
+	}
+	
 }
 
 class AimAssist_JsonObjectKeys {
 	Array<String> keys;
 }
 
+class AimAssist_JsonObjectTableElement {
+	Array<AimAssist_JsonObjectElement> kv_for_hash;
+}
+
 class AimAssist_JsonObject : AimAssist_JsonElement {
 	const table_size = 256; // rather small for a general hash table, but should be enough for a json object
-	private Array<AimAssist_JsonObjectElement> table[table_size];
+	//private Array<AimAssist_JsonObjectElement> table[table_size];
+	private Array<AimAssist_JsonObjectTableElement> table;
 	private uint elems;
 	
 	static AimAssist_JsonObject make(){
-		return new("AimAssist_JsonObject");
+		let obj = new("AimAssist_JsonObject");
+		obj.table.resize(256);
+		for(uint i = 0; i < 256; i++) {
+			obj.table[i] = new("AimAssist_JsonObjectTableElement");
+		}
+		return obj;
 	}
 	
 	private uint hash(String s){ // djb2 hashing algorithm
@@ -67,32 +81,33 @@ class AimAssist_JsonObject : AimAssist_JsonElement {
 	
 	AimAssist_JsonElement get(String key){
 		uint sz=table_size;
-		return getFrom(table[hash(key)%sz],key);
+		return getFrom(table[hash(key)%sz].kv_for_hash,key);
 	}
 	
 	void set(String key,AimAssist_JsonElement e){
 		uint sz=table_size;
-		setAt(table[hash(key)%sz],key,e,true);
+		setAt(table[hash(key)%sz].kv_for_hash,key,e,true);
 	}
 	
 	bool insert(String key,AimAssist_JsonElement e){//only inserts if key doesn't exist, otherwise fails and returns false
 		uint sz=table_size;
-		return setAt(table[hash(key)%sz],key,e,false);
+		return setAt(table[hash(key)%sz].kv_for_hash,key,e,false);
 	}
 	
 	bool delete(String key){
 		uint sz=table_size;
-		return delAt(table[hash(key)%sz],key);
+		return delAt(table[hash(key)%sz].kv_for_hash,key);
 	}
 	
-	AimAssist_JsonObjectKeys getKeys(){
-		AimAssist_JsonObjectKeys keys = new("AimAssist_JsonObjectKeys");
-		for(uint i=0;i<table_size;i++){
-			for(uint j=0;j<table[i].size();j++){
-				keys.keys.push(table[i][j].key);
+	void getKeys(out Array<String> keys){
+		keys.Clear();
+		for(uint i = 0; i < table_size; i++) {
+			let n = table[i].kv_for_hash.size();
+			for(uint j = 0; j < n; j++) {
+				console.printf("table[i]["..j.."]");
+				keys.Push(table[i].kv_for_hash[j].key);
 			}
 		}
-		return keys;
 	}
 	
 	bool empty(){
@@ -101,7 +116,7 @@ class AimAssist_JsonObject : AimAssist_JsonElement {
 	
 	void clear(){
 		for(uint i=0;i<table_size;i++){
-			table[i].clear();
+			table[i].kv_for_hash.clear();
 		}
 	}
 	
@@ -114,11 +129,11 @@ class AimAssist_JsonObject : AimAssist_JsonElement {
 		s.AppendCharacter(AimAssist_JSON.CURLY_OPEN);
 		bool first=true;
 		for(uint i=0;i<table_size;i++){
-			for(uint j=0;j<table[i].size();j++){
+			for(uint j=0;j<table[i].kv_for_hash.size();j++){
 				if(!first){
 					s.AppendCharacter(AimAssist_JSON.COMMA);
 				}
-				s.AppendFormat("%s:%s",AimAssist_JSON.serialize_string(table[i][j].key),table[i][j].e.serialize());
+				s.AppendFormat("%s:%s",AimAssist_JSON.serialize_string(table[i].kv_for_hash[j].key),table[i].kv_for_hash[j].e.serialize());
 				first=false;
 			}
 		}

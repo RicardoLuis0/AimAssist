@@ -51,7 +51,7 @@ class AimAssistHandler : StaticEventHandler{
 			"cl_recenter_always_enabled"
 	};
 	
-	static const Class<AimAssist_JsonElement> preset_cvar_types[] = {
+	static const Class<AimAssist_JsonElement> preset_cvar_json_types[] = {
 		// -----------
 		//  base
 		// -----------
@@ -92,11 +92,11 @@ class AimAssistHandler : StaticEventHandler{
 	};
 	
 	
-	static const String preset_pretty_types[] = {
+	static const Name preset_pretty_types[] = {
 		// -----------
 		//  base
 		// -----------
-			"Bool",	// cl_aim_assist_enabled
+			"Bool",		// cl_aim_assist_enabled
 			"Number",	// cl_aim_assist_angle_max
 			"Number",	// cl_aim_assist_max_dist
 			"Number",	// cl_aim_assist_rot_speed
@@ -122,15 +122,16 @@ class AimAssistHandler : StaticEventHandler{
 			"Number",	// cl_aim_assist_precision
 			"Number",	// cl_aim_assist_radial_precision
 			
-			"Bool",	// cl_aim_assist_check_for_obstacles
+			"Bool",		// cl_aim_assist_check_for_obstacles
 			"Number",	// cl_aim_assist_on_obstruction
 		// -----------
 		//  recenter
 		// -----------
-			"Bool",	// cl_recenter_enabled
+			"Bool",		// cl_recenter_enabled
 			"Number",	// cl_recenter_step
-			"Bool"	// cl_recenter_always_enabled
+			"Bool"		// cl_recenter_always_enabled
 	};
+	
 	
 	int FindPresetCVarName(String cvar_name){
 		let n = preset_cvars.Size();
@@ -158,25 +159,27 @@ class AimAssistHandler : StaticEventHandler{
 			Array<String> invalidKeys;
 			
 			presets = AimAssist_JsonObject(presetsOrError);
-			let keys = presets.GetKeys();
-			let n = keys.keys.Size();
+			Array<String> keys;
+			presets.GetKeys(keys);
+			let n = keys.Size();
 			
 			let PRESET_COUNT = preset_cvars.Size();
 			
 			for(uint i = 0; i < n; i++) {
 				bool invalid = false;
-				let key = keys.keys[i];
+				let key = keys[i];
 				let value = presets.Get(key);
 				if(!(value is "AimAssist_JsonObject")) {
 					console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' is not a JSON Object");
 				} else {
 					let obj = AimAssist_JsonObject(value);
-					let obj_keys = obj.GetKeys();
-					let n = obj_keys.keys.Size();
+					Array<String> obj_keys;
+					obj.GetKeys(obj_keys);
+					let n = obj_keys.Size();
 					Array<int> cvar_key_count;
 					cvar_key_count.Resize(PRESET_COUNT);
 					for(uint i = 0; i < n; i++) {
-						let cvar_name = obj_keys.keys[i];
+						let cvar_name = obj_keys[i];
 						//int j = preset_cvars.Find(cvar_name);
 						int j = FindPresetCVarName(cvar_name);
 						if(j == PRESET_COUNT) {
@@ -184,9 +187,11 @@ class AimAssistHandler : StaticEventHandler{
 							console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' has an invalid CVar '"..cvar_name.."'");
 						} else {
 							let cvar_data = obj.Get(cvar_name);
-							if(!(cvar_data is preset_cvar_types[j])){
+							if(!(cvar_data is preset_cvar_json_types[j])){
 								invalid = true;
 								console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' CVar '"..cvar_name.."' has type '"..cvar_data.GetPrettyName().."', expected '"..preset_pretty_types[j].."'");
+							} else {
+								cvar_key_count[j]++;
 							}
 						}
 					}
@@ -208,6 +213,76 @@ class AimAssistHandler : StaticEventHandler{
 			for(uint i = 0; i < n; i++) {
 				presets.delete(invalidKeys[i]);
 			}
+		}
+	}
+	
+	clearscope void SavePresetsToCVar(){
+		CVar.FindCVar("__aim_assist_user_presets_json").SetString(presets.serialize());
+	}
+	
+	clearscope AimAssist_JsonObject CurrentToJson() {
+		let obj = AimAssist_JsonObject.make();
+		let n = preset_cvars.Size();
+		for(uint i = 0; i < n; i++){
+			AimAssist_JsonElement e;
+			CVar c = CVar.GetCVar(preset_cvars[i],players[consoleplayer]);
+			switch(c.GetRealType()){
+			case CVar.CVAR_Int:
+				e = AimAssist_JsonInt.make(c.GetInt());
+				break;
+			case CVar.CVAR_Float:
+				e = AimAssist_JsonDouble.make(c.GetFloat());
+				break;
+			case CVar.CVAR_Bool:
+				e = AimAssist_JsonBool.make(c.GetBool());
+				break;
+			}
+			obj.Set(preset_cvars[i],e);
+		}
+		return obj;
+	}
+	
+	clearscope void LoadPreset(string preset_name) {
+		let obj_e = presets.Get(preset_name);
+		if(obj_e && obj_e is "AimAssist_JsonObject") {
+			let obj = AimAssist_JsonObject(obj_e);
+			let n = preset_cvars.Size();
+			for(uint i = 0; i < n; i++){
+				CVar c = CVar.GetCVar(preset_cvars[i],players[consoleplayer]);
+				let e = obj.Get(preset_cvars[i]);
+				
+				switch(c.GetRealType()){
+				case CVar.CVAR_Int:
+					c.SetInt(AimAssist_JsonNumber(e).GetInt());
+					break;
+				case CVar.CVAR_Float:
+					c.SetFloat(AimAssist_JsonNumber(e).GetDouble());
+					break;
+				case CVar.CVAR_Bool:
+					c.SetBool(AimAssist_JsonBool(e).b);
+					break;
+				}
+			}
+		}
+	}
+	
+	clearscope void ExecuteCommand(name cmd,string data) {
+		switch(cmd) {
+		case Name("SaveUserPreset"):
+			presets.Set(data,CurrentToJson());
+			SavePresetsToCVar();
+			break;
+		case Name("DeleteUserPreset"):
+			presets.Delete(data);
+			SavePresetsToCVar();
+			break;
+		case Name("LoadUserPreset"):
+			LoadPreset(data);
+			break;
+		case Name("ResetToDefault"):
+		case Name("LoadDefaultPreset"):
+		default:
+			console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."unkonwn confirm command "..cmd.." , ignoring it");
 		}
 	}
 
