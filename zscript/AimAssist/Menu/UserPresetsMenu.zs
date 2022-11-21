@@ -109,7 +109,7 @@ class OptionMenuItemAimAssistSaveUserPreset : OptionMenuItemSubmenu
 {
 	OptionMenuItemAimAssistSaveUserPreset Init()
 	{
-		Super.Init("Confirm", "");
+		Super.Init("Confirm", "", 0, true);
 		return self;
 	}
 	
@@ -121,7 +121,7 @@ class OptionMenuItemAimAssistSaveUserPreset : OptionMenuItemSubmenu
 		{
 			AimAssistHandler(StaticEventHandler.Find("AimAssistHandler")).ExecuteCommand("SaveUserPreset",__aim_assist_save_preset_name);
 			CVar.GetCVar("__aim_assist_save_preset_name").SetString("");
-			//parentMenu.toClose = true;
+			parentMenu.toClose = true;
 			return true;
 		}
 		return Super.MenuEvent(mkey, fromcontroller);
@@ -132,11 +132,15 @@ class OptionMenuItemAimAssistSaveUserPreset : OptionMenuItemSubmenu
 		let handler = AimAssistHandler(StaticEventHandler.Find("AimAssistHandler"));
 		parentMenu = AimAssistSavePresetMenu(Menu.GetCurrentMenu());
 		handler.presets;
-		if(handler.presets.Get(__aim_assist_save_preset_name) != null) {
+		if(__aim_assist_save_preset_name.RightIndexOf(" ") != -1){
+			Menu.StartMessage(TEXTCOLOR_NORMAL.."Preset Name Cannot Contain Whitespace", 1);
+		} else if(handler.presets.Get(__aim_assist_save_preset_name) != null) {
 			Menu.StartMessage(TEXTCOLOR_NORMAL.."Overwrite existing preset '"..__aim_assist_save_preset_name.."'?", 0);
+		} else if(__aim_assist_save_preset_name.Length() == 0){
+			Menu.StartMessage(TEXTCOLOR_NORMAL.."Cannot Create Preset with Empty Name", 1);
 		} else {
 			handler.ExecuteCommand("SaveUserPreset",__aim_assist_save_preset_name);
-			//parentMenu.Close();
+			parentMenu.Close();
 		}
 		return true;
 	}
@@ -204,10 +208,29 @@ class AimAssistUserPresetsMenu : OptionMenu {
 	override void OnReturn() {
 		if(toClose) {
 			AimAssistPresetsMenu(mParentMenu).toClose = toClose - 1;
+			mDesc.mSelectedItem = 0;
 			Close();
 		}
 	}
 }
+
+class OptionMenuItemUserPresetsSubmenu : OptionMenuItemSubmenu {
+	AimAssistHandler handler;
+	OptionMenuItemUserPresetsSubmenu Init(String label, Name command, int param = 0, bool centered = false) {
+		Super.Init(label,command,param,centered);
+		handler = AimAssistHandler(StaticEventHandler.Find("AimAssistHandler"));
+		return self;
+	}
+	override bool Selectable() {
+		return handler.presets.size() != 0;
+	}
+	
+	override bool Activate() {
+		if(Selectable()) return Super.Activate();
+		return false;
+	}
+}
+
 class AimAssistPresetsMenu : OptionMenu {
 	bool toClose;
 	

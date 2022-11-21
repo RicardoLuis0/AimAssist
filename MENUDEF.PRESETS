@@ -6,8 +6,12 @@ OptionMenu "AimAssistPresetMenu" {
 	AimAssistConfirmCommand "Reset to Default", "ResetToDefault", "", "Are you sure you want to reset to default settings?"
 	
 	Submenu "Built-in Presets", "AimAssistBuiltInPresets"
-	Submenu "User Presets", "AimAssistUserPresets"
+	UserPresetsSubmenu "User Presets", "AimAssistUserPresets"
 	Submenu "Save Current Preset", "AimAssistSaveUserPreset"
+	
+}
+
+OptionMenu "AimAssistBuiltInPresets" {
 	
 }
 
