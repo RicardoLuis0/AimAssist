@@ -194,11 +194,8 @@ class AimAssistUserPresetsMenu : OptionMenu {
 	
 	override void Init(Menu parent, OptionMenuDescriptor desc) {
 		
-		//if(desc.mItems.Size() == 0){
-			RebuildList(desc);
-		//}
+		RebuildList(desc);
 		
-		//console.printf("AimAssistUserPresetsMenu::Init");
 		Super.Init(parent,desc);
 	}
 	

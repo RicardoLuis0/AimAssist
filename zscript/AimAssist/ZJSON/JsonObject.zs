@@ -104,7 +104,6 @@ class AimAssist_JsonObject : AimAssist_JsonElement {
 		for(uint i = 0; i < table_size; i++) {
 			let n = table[i].kv_for_hash.size();
 			for(uint j = 0; j < n; j++) {
-				console.printf("table[i]["..j.."]");
 				keys.Push(table[i].kv_for_hash[j].key);
 			}
 		}

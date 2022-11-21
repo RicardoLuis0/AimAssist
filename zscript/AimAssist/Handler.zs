@@ -248,7 +248,7 @@ class AimAssistHandler : StaticEventHandler{
 			let obj = AimAssist_JsonObject(obj_e);
 			let n = preset_cvars.Size();
 			for(uint i = 0; i < n; i++){
-				CVar c = CVar.GetCVar(preset_cvars[i],players[consoleplayer]);
+				CVar c = CVar.FindCVar(preset_cvars[i]);
 				let e = obj.Get(preset_cvars[i]);
 				
 				switch(c.GetRealType()){
