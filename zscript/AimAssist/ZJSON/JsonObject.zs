@@ -8,9 +8,6 @@ class AimAssist_JsonObjectElement {
 		elem.e=e;
 		return elem;
 	}
-	override void OnDestroy(){
-		console.printf("AimAssist_JsonObjectElement Being destroyed with key = "..key);
-	}
 	
 }
 
