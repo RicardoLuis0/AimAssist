@@ -180,7 +180,6 @@ class AimAssistHandler : StaticEventHandler{
 					cvar_key_count.Resize(PRESET_COUNT);
 					for(uint i = 0; i < n; i++) {
 						let cvar_name = obj_keys[i];
-						//int j = preset_cvars.Find(cvar_name);
 						int j = FindPresetCVarName(cvar_name);
 						if(j == PRESET_COUNT) {
 							invalid = true;
