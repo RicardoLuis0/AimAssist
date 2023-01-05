@@ -32,8 +32,6 @@ class AimAssistPlayerData {
 	
 	bool always_recenter;
 	
-	bool debug_traces;
-	
 	void UpdateCVARs(int pnum){
 		PlayerInfo player=players[pnum];
 		enabled=CVAR.GetCVar("cl_aim_assist_enabled",player).getBool();
@@ -54,7 +52,6 @@ class AimAssistPlayerData {
 		transition_start=CVAR.GetCVar("cl_aim_assist_height_mode_transition_distance_start",player).getFloat();
 		transition_end=CVAR.GetCVar("cl_aim_assist_height_mode_transition_distance_end",player).getFloat();
 		on_obstruction=CVAR.GetCVar("cl_aim_assist_on_obstruction",player).getInt();
-		debug_traces=CVAR.GetCVar("cl_aim_assist_trace_debug",player).getBool();
 		mIsEnabled=CVAR.GetCVar("cl_recenter_enabled",player).getBool();
 		mStep=CVAR.GetCVar("cl_recenter_step",player).getFloat();
 		always_recenter=CVAR.GetCVar("cl_recenter_always_enabled",player).getBool();
@@ -114,18 +111,7 @@ class AimAssistPlayerData {
 						closest_distance=a.Distance3D(t.HitActor);
 						hitloc=t.HitLocation;
 					}
-					if(debug_traces){
-						let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
-						a.A_SpawnParticle("#FF0000",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);
-					}
-				} else if (debug_traces) {
-					let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
-					a.A_SpawnParticle("#FFFF00",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);
 				}
-			} else if (debug_traces) {
-				
-				let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
-				a.A_SpawnParticle("#00FF00",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);
 			}
 		}
 		return closest,closest_distance,hitloc;

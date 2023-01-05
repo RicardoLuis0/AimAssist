@@ -1,6 +1,5 @@
 version "4.10.0"
 #include "ZScript/AimAssist/Handler.zs"
 #include "ZScript/AimAssist/PlayerData.zs"
-#include "ZScript/AimAssist/Marker.zs"
 #include "ZScript/AimAssist/Menu.zs"
 #include "ZScript/AimAssist/ZJSON/Include.zs"

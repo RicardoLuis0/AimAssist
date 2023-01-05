@@ -1,12 +1,5 @@
 class AimAssistHandler : StaticEventHandler{
 
-	bool mark;//if to display markers or not
-
-	AimAssistDebugMaker1 marker1;//target marker
-	AimAssistDebugMaker2 marker2;//current aim marker
-	AimAssistDebugMaker3 marker3;//obstruction marker
-	AimAssistDebugMaker4 marker4;//obstruction marker
-
 	AimAssistPlayerData playerData[MAXPLAYERS];
 	
 	AimAssist_JsonObject presets;
@@ -49,30 +42,6 @@ class AimAssistHandler : StaticEventHandler{
 			"cl_recenter_enabled",
 			"cl_recenter_step",
 			"cl_recenter_always_enabled"
-	};
-	
-	static const Name old_cvars[] = {
-		"AIM_ASSIST_ENABLED",
-		"AIM_ASSIST_ANGLE_MAX",
-		"AIM_ASSIST_MAX_DIST",
-		"AIM_ASSIST_ROT_SPEED",
-		"AIM_ASSIST_METHOD",
-		"AIM_ASSIST_HEIGHT_MODE",
-		"AIM_ASSIST_VERTICAL_PLUS_OFFSET_ENEMY",
-		"AIM_ASSIST_VERTICAL_MINUS_OFFSET_ENEMY",
-		"AIM_ASSIST_ENEMY_HEIGHT_MULT",
-		"AIM_ASSIST_VERTICAL_PLUS_OFFSET_PLAYER",
-		"AIM_ASSIST_VERTICAL_MINUS_OFFSET_PLAYER",
-		"AIM_ASSIST_PLAYER_HEIGHT_MULT",
-		"AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_START",
-		"AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_END",
-		"AIM_ASSIST_PRECISION",
-		"AIM_ASSIST_RADIAL_PRECISION",
-		"AIM_ASSIST_CHECK_FOR_OBSTACLES",
-		"AIM_ASSIST_ON_OBSTRUCTION",
-		"rc_enabled",
-		"rc_step",
-		"rc_always_enabled"
 	};
 	
 	static const Class<AimAssist_JsonElement> preset_cvar_json_types[] = {
@@ -289,24 +258,6 @@ class AimAssistHandler : StaticEventHandler{
 		}
 	}
 	
-	clearscope void LoadOldCVars() {
-		let n = preset_cvars.Size();
-		for(uint i = 0; i < n; i++) {
-			CVar c = CVar.FindCVar(preset_cvars[i]);
-			switch(c.GetRealType()) {
-			case CVar.CVAR_Int:
-				c.SetInt(CVar.FindCVar(old_cvars[i]).GetInt());
-				break;
-			case CVar.CVAR_Float:
-				c.SetFloat(CVar.FindCVar(old_cvars[i]).GetFloat());
-				break;
-			case CVar.CVAR_Bool:
-				c.SetBool(CVar.FindCVar(old_cvars[i]).GetBool());
-				break;
-			}
-		}
-	}
-	
 	clearscope void ResetToDefault(bool performance = false) {
 		let n = preset_cvars.Size();
 		for(uint i = 0; i < n; i++){
@@ -338,19 +289,12 @@ class AimAssistHandler : StaticEventHandler{
 		case Name("LoadPerformancePreset"):
 			ResetToDefault(true);
 			break;
-		case Name("LoadOldCVars"):
-			LoadOldCVars();
-			break;
 		default:
 			console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."unkonwn confirm command "..cmd.." , ignoring it");
 		}
 	}
 
 	override void WorldLoaded(WorldEvent e){
-		marker1=null;
-		marker2=null;
-		marker3=null;
-		marker4=null;
 		for(int i=0;i<MAXPLAYERS;i++) {
 			if(playeringame[i]) {
 				UpdateCVARs(i);
@@ -361,29 +305,10 @@ class AimAssistHandler : StaticEventHandler{
 	override void PlayerEntered(PlayerEvent e){
 		UpdateCVARs(e.playernumber);
 	}
-	
-	override void WorldUnloaded(WorldEvent e){
-		marker1=null;
-		marker2=null;
-		marker3=null;
-		marker4=null;
-	}
-	
-	override void PlayerDisconnected(PlayerEvent e){
-		if(e.PlayerNumber==consoleplayer){
-			if(mark){
-				ClearMarkers();
-			}
-		}
-	}
 
 	//update cvar values
 	void UpdateCVARs(int pnum){
 		playerData[pnum].UpdateCVARs(pnum);
-		if(pnum==consoleplayer){
-			ClearMarkers();
-			mark=CVAR.GetCVar("cl_aim_assist_debug_marker",players[consoleplayer]).getBool();
-		}
 	}
 
 	void UpdateAllCVARs(){
@@ -391,37 +316,6 @@ class AimAssistHandler : StaticEventHandler{
 			if(playeringame[i]){
 				UpdateCVARs(i);
 			}
-		}
-	}
-	
-	//get rid of markers in world
-	void ClearMarkers(){
-		if(marker1){
-			marker1.destroy();
-			marker1=null;
-		}
-		if(marker2){
-			marker2.destroy();
-			marker2=null;
-		}
-		if(marker3){
-			marker3.destroy();
-			marker3=null;
-		}
-		if(marker4){
-			marker4.destroy();
-			marker4=null;
-		}
-	}
-	
-	void ClearObstructionMarkers(){
-		if(marker3){
-			marker3.destroy();
-			marker3=null;
-		}
-		if(marker4){
-			marker4.destroy();
-			marker4=null;
 		}
 	}
 
@@ -442,8 +336,6 @@ class AimAssistHandler : StaticEventHandler{
 	bool doAim(int pnum){
 		if(!playerData[pnum].aimEnabled()) return false;
 		PlayerPawn pawn=players[pnum].mo;
-		
-		bool do_mark=pnum==consoleplayer&&mark;
 		
 		float closest_distance=playerData[pnum].max_distance+1;
 		Actor closest=null;
@@ -473,18 +365,6 @@ class AimAssistHandler : StaticEventHandler{
 			Vector3 view=pawn.pos+(0,0,pheight);
 			//get target angle and pitch
 			[delta,target_angle,target_pitch]=lookAt(view,closest.pos+aimheight);
-
-			//show/move markers
-			if(do_mark){
-				if(!marker1){
-					marker1=AimAssistDebugMaker1(pawn.Spawn("AimAssistDebugMaker1",pawn.pos,NO_REPLACE));
-				}
-				if(!marker2){
-					marker2=AimAssistDebugMaker2(pawn.Spawn("AimAssistDebugMaker2",pawn.pos,NO_REPLACE));
-				}
-				marker1.setOrigin(hitloc,true);
-				marker2.setOrigin(closest.pos+aimheight,true);
-			}
 			
 			//check if view is obstructed
 			if(playerData[pnum].check_obstacles){
@@ -492,12 +372,6 @@ class AimAssistHandler : StaticEventHandler{
 				double max_distance=playerData[pnum].max_distance;
 				pawn.LineTrace(target_angle,max_distance,target_pitch,TRF_NOSKY,pawn.viewheight*pawn.player.crouchfactor,data:t);
 				if(t.hitType!=TRACE_HitActor||t.hitActor!=closest){
-					if(do_mark){
-						if(!marker3){
-							marker3=AimAssistDebugMaker3(pawn.Spawn("AimAssistDebugMaker3",pawn.pos,NO_REPLACE));
-						}
-						marker3.setOrigin(t.hitLocation,false);
-					}
 					switch(playerData[pnum].on_obstruction){
 					default:
 					case 1://aim correction
@@ -505,40 +379,20 @@ class AimAssistHandler : StaticEventHandler{
 						[delta,target_angle,target_pitch]=lookAt(view,(hitloc.x,hitloc.y,closest.pos.z+aimheight.z));
 						pawn.LineTrace(target_angle,max_distance,target_pitch,TRF_NOSKY,pawn.viewheight*pawn.player.crouchfactor,data:t);
 						if(t.hitType==TRACE_HitActor&&t.hitActor==closest){
-							if(do_mark){
-								if(!marker4){
-									marker4=AimAssistDebugMaker4(pawn.Spawn("AimAssistDebugMaker4",pawn.pos,NO_REPLACE));
-								}
-								marker4.setOrigin((hitloc.x,hitloc.y,closest.pos.z+aimheight.z),false);
-							}
 							break;
 						}
 						//try to aim at correct xy
 						[delta,target_angle,target_pitch]=lookAt(view,(closest.pos.x,closest.pos.y,hitloc.z));
 						pawn.LineTrace(target_angle,max_distance,target_pitch,TRF_NOSKY,pawn.viewheight*pawn.player.crouchfactor,data:t);
 						if(t.hitType==TRACE_HitActor&&t.hitActor==closest){
-							if(do_mark){
-								if(!marker4){
-									marker4=AimAssistDebugMaker4(pawn.Spawn("AimAssistDebugMaker4",pawn.pos,NO_REPLACE));
-								}
-								marker4.setOrigin((closest.pos.x,closest.pos.y,hitloc.z),false);
-							}
 							break;
 						}
 					case 2://target closest
 						[delta,target_angle,target_pitch]=lookAt(view,hitloc);
-						if(do_mark){
-							if(!marker4){
-								marker4=AimAssistDebugMaker4(pawn.Spawn("AimAssistDebugMaker4",pawn.pos,NO_REPLACE));
-							}
-							marker4.setOrigin(hitloc,false);
-						}
 						break;
 					case 0://don't aim
 						return false;
 					}
-				}else if(do_mark){
-					ClearObstructionMarkers();
 				}
 			}
 
@@ -564,10 +418,6 @@ class AimAssistHandler : StaticEventHandler{
 			}
 			return true;
 		}else{
-			if(do_mark){
-				//if no target, remove markers
-				ClearMarkers();
-			}
 			return false;
 		}
 	}
@@ -580,9 +430,6 @@ class AimAssistHandler : StaticEventHandler{
 					playerData[i].doRecenter(players[i].mo);
 				}
 			}
-		}
-		if (gameaction == ga_savegame || gameaction == ga_autosave) {
-			ClearMarkers();
 		}
 	}
 
