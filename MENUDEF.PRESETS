@@ -3,12 +3,18 @@ OptionMenu "AimAssistPresetMenu" {
 	
 	Class "AimAssistPresetsMenu"
 	
-	AimAssistConfirmCommand "Reset to Default", "ResetToDefault", "", "Are you sure you want to reset to default settings?"
 	
 	Submenu "Built-in Presets", "AimAssistBuiltInPresets"
 	UserPresetsSubmenu "User Presets", "AimAssistUserPresets"
 	Submenu "Save Current Preset", "AimAssistSaveUserPreset"
 	
+	StaticText ""
+	
+	AimAssistConfirmCommand "Reset to Default", "ResetToDefault", "", "Are you sure you want to reset to default settings?"
+	StaticText ""
+	StaticText ""
+	
+	AimAssistConfirmCommand "Load Old Format Config", "LoadOldCVars", "", "Are you sure you want to replace the current config?"
 }
 
 OptionMenu "AimAssistBuiltInPresets" {

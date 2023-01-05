@@ -11,7 +11,7 @@ class AimAssistHandler : StaticEventHandler{
 	
 	AimAssist_JsonObject presets;
 	
-	static const String preset_cvars[] = {
+	static const Name preset_cvars[] = {
 		// -----------
 		//  base
 		// -----------
@@ -49,6 +49,30 @@ class AimAssistHandler : StaticEventHandler{
 			"cl_recenter_enabled",
 			"cl_recenter_step",
 			"cl_recenter_always_enabled"
+	};
+	
+	static const Name old_cvars[] = {
+		"AIM_ASSIST_ENABLED",
+		"AIM_ASSIST_ANGLE_MAX",
+		"AIM_ASSIST_MAX_DIST",
+		"AIM_ASSIST_ROT_SPEED",
+		"AIM_ASSIST_METHOD",
+		"AIM_ASSIST_HEIGHT_MODE",
+		"AIM_ASSIST_VERTICAL_PLUS_OFFSET_ENEMY",
+		"AIM_ASSIST_VERTICAL_MINUS_OFFSET_ENEMY",
+		"AIM_ASSIST_ENEMY_HEIGHT_MULT",
+		"AIM_ASSIST_VERTICAL_PLUS_OFFSET_PLAYER",
+		"AIM_ASSIST_VERTICAL_MINUS_OFFSET_PLAYER",
+		"AIM_ASSIST_PLAYER_HEIGHT_MULT",
+		"AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_START",
+		"AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_END",
+		"AIM_ASSIST_PRECISION",
+		"AIM_ASSIST_RADIAL_PRECISION",
+		"AIM_ASSIST_CHECK_FOR_OBSTACLES",
+		"AIM_ASSIST_ON_OBSTRUCTION",
+		"rc_enabled",
+		"rc_step",
+		"rc_always_enabled"
 	};
 	
 	static const Class<AimAssist_JsonElement> preset_cvar_json_types[] = {
@@ -92,7 +116,7 @@ class AimAssistHandler : StaticEventHandler{
 	};
 	
 	
-	static const Name preset_pretty_types[] = {
+	static const String preset_pretty_types[] = {
 		// -----------
 		//  base
 		// -----------
@@ -215,7 +239,7 @@ class AimAssistHandler : StaticEventHandler{
 		}
 	}
 	
-	clearscope void SavePresetsToCVar(){
+	clearscope void SavePresets(){
 		CVar.FindCVar("__aim_assist_user_presets_json").SetString(presets.serialize());
 	}
 	
@@ -246,7 +270,7 @@ class AimAssistHandler : StaticEventHandler{
 		if(obj_e && obj_e is "AimAssist_JsonObject") {
 			let obj = AimAssist_JsonObject(obj_e);
 			let n = preset_cvars.Size();
-			for(uint i = 0; i < n; i++){
+			for(uint i = 0; i < n; i++) {
 				CVar c = CVar.FindCVar(preset_cvars[i]);
 				let e = obj.Get(preset_cvars[i]);
 				
@@ -265,7 +289,25 @@ class AimAssistHandler : StaticEventHandler{
 		}
 	}
 	
-	clearscope void ResetCVarsToDefault(bool performance = false) {
+	clearscope void LoadOldCVars() {
+		let n = preset_cvars.Size();
+		for(uint i = 0; i < n; i++) {
+			CVar c = CVar.FindCVar(preset_cvars[i]);
+			switch(c.GetRealType()) {
+			case CVar.CVAR_Int:
+				c.SetInt(CVar.FindCVar(old_cvars[i]).GetInt());
+				break;
+			case CVar.CVAR_Float:
+				c.SetFloat(CVar.FindCVar(old_cvars[i]).GetFloat());
+				break;
+			case CVar.CVAR_Bool:
+				c.SetBool(CVar.FindCVar(old_cvars[i]).GetBool());
+				break;
+			}
+		}
+	}
+	
+	clearscope void ResetToDefault(bool performance = false) {
 		let n = preset_cvars.Size();
 		for(uint i = 0; i < n; i++){
 			CVar.FindCVar(preset_cvars[i]).ResetToDefault();
@@ -280,21 +322,24 @@ class AimAssistHandler : StaticEventHandler{
 		switch(cmd) {
 		case Name("SaveUserPreset"):
 			presets.Set(data,CurrentToJson());
-			SavePresetsToCVar();
+			SavePresets();
 			break;
 		case Name("DeleteUserPreset"):
 			presets.Delete(data);
-			SavePresetsToCVar();
+			SavePresets();
 			break;
 		case Name("LoadUserPreset"):
 			LoadPreset(data);
 			break;
 		case Name("ResetToDefault"):
 		case Name("LoadDefaultPreset"):
-			ResetCVarsToDefault();
+			ResetToDefault();
 			break;
 		case Name("LoadPerformancePreset"):
-			ResetCVarsToDefault(true);
+			ResetToDefault(true);
+			break;
+		case Name("LoadOldCVars"):
+			LoadOldCVars();
 			break;
 		default:
 			console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."unkonwn confirm command "..cmd.." , ignoring it");
