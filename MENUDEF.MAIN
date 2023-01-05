@@ -10,7 +10,7 @@ AddOptionMenu "OptionsMenuSimple" {
 
 OptionMenu "AimAssistMenu" {
 	Title "Aim Assist"
-	StaticText "v0.8.0 by RicardoLuis0","Gold"
+	StaticText "v0.8.1-dev by RicardoLuis0","Gold"
 	StaticText ""
 	Option "Aim Assist Enabled","cl_aim_assist_enabled","OnOff"
 	Submenu "Settings Presets", "AimAssistPresetMenu"
