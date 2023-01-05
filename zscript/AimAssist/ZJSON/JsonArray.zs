@@ -59,18 +59,20 @@ class AimAssist_JsonArray : AimAssist_JsonElement { // pretty much just a wrappe
 	
 	override string serialize(){
 		String s;
-		bool first=true;
+		bool first = true;
 		s.AppendCharacter(AimAssist_JSON.SQUARE_OPEN);
-		for(uint i=0;i<arr.size();i++){
+		let n = arr.Size();
+		for(int i = 0; i < n; i++){
 			if(!first){
 				s.AppendCharacter(AimAssist_JSON.COMMA);
 			}
-			s.AppendFormat("%s",arr[i].serialize());
+			s.AppendFormat("%s", arr[i].serialize());
 			first=false;
 		}
 		s.AppendCharacter(AimAssist_JSON.SQUARE_CLOSE);
 		return s;
 	}
+	
 	override string GetPrettyName() {
 		return "Array";
 	}

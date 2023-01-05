@@ -1,4 +1,5 @@
-class OptionMenuCheckSliderBase : OptionMenuSliderBase {
+class OptionMenuCheckSliderBase : OptionMenuSliderBase
+{
 	
 	double mMin, mMax, mStep;
 	int mShowValue;
@@ -6,7 +7,15 @@ class OptionMenuCheckSliderBase : OptionMenuSliderBase {
 	int mSliderShort;
 	CVar mGrayCheck;
 	
-	OptionMenuCheckSliderBase Init(String label, double min, double max, double step, int showval, Name command = 'none', CVar graycheck = NULL) {
+	OptionMenuCheckSliderBase Init (
+		String label,
+		double min,
+		double max,
+		double step,
+		int showval,
+		Name command = 'none',
+		CVar graycheck = NULL
+	) {
 		Super.Init(label, min, max, step, showval, command, graycheck);
 		mMin = min;
 		mMax = max;
@@ -23,9 +32,9 @@ class OptionMenuCheckSliderBase : OptionMenuSliderBase {
 	}
 
 	override bool isGrayed(void) {
-		return mGrayCheck != NULL && !mGrayCheck.GetInt();
+		return mGrayCheck && !mGrayCheck.GetInt();
 	}
-
+	
 	override bool Selectable(void) {
 		return !isGrayed();
 	}
@@ -40,7 +49,7 @@ class OptionMenuCheckSliderBase : OptionMenuSliderBase {
 		String textbuf;
 		double range;
 		int maxlen = 0;
-		int right = x + (12*16 + 4) * CleanXfac_1;	// length of slider. This uses the old ConFont and 
+		int right = x + (12 * 16 + 4) * CleanXfac_1;	// length of slider. This uses the old ConFont and 
 		int cy = y + CleanYFac;
 
 		range = max - min;
@@ -70,7 +79,7 @@ class OptionMenuCheckSliderBase : OptionMenuSliderBase {
 	}
 	
 	override int Draw(OptionMenuDescriptor desc, int y, int indent, bool selected) {
-		drawLabel(indent, y, selected? OptionMenuSettings.mFontColorSelection : OptionMenuSettings.mFontColor, isGrayed());
+		drawLabel(indent, y, selected ? OptionMenuSettings.mFontColorSelection : OptionMenuSettings.mFontColor, isGrayed());
 		mDrawX = indent + CursorSpace();
 		DrawSlider (mDrawX, y, mMin, mMax, GetSliderValue(), mShowValue, indent, isGrayed());
 		return indent;
@@ -78,12 +87,20 @@ class OptionMenuCheckSliderBase : OptionMenuSliderBase {
 
 }
 
-class OptionMenuItemCheckSlider : OptionMenuCheckSliderBase {
+class OptionMenuItemCheckSlider : OptionMenuCheckSliderBase
+{
 	
 	CVar mCVar;
 	
-	OptionMenuItemCheckSlider Init(String label, Name command, double min, double max, double step, int showval = 1, CVar graycheck = NULL)
-	{
+	OptionMenuItemCheckSlider Init (
+		String label,
+		Name command,
+		double min,
+		double max,
+		double step,
+		int showval = 1,
+		CVar graycheck = NULL
+	) {
 		Super.Init(label, min, max, step, showval, command, graycheck);
 		mCVar = CVar.FindCVar(command);
 		return self;

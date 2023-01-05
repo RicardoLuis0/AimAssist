@@ -1,4 +1,3 @@
-
 class AimAssistPresetMessageBox : CustomMessageBoxMenuBase {
 	
 	string mPreset;
@@ -190,14 +189,13 @@ class AimAssistUserPresetsMenu : OptionMenu {
 		Array<String> keys;
 		handler.presets.getKeys(keys);
 		let n = keys.Size();
-		for(uint i = 0; i < n; i++) {
+		for(int i = 0; i < n; i++) {
 			desc.mItems.Push(new("AimAssistUserPreset").Init(keys[i]));
 		}
 	}
 	
 	
 	override void Init(Menu parent, OptionMenuDescriptor desc) {
-		
 		RebuildList(desc);
 		
 		Super.Init(parent,desc);

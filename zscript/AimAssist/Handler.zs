@@ -135,7 +135,7 @@ class AimAssistHandler : StaticEventHandler{
 	
 	int FindPresetCVarName(String cvar_name){
 		let n = preset_cvars.Size();
-		for(int i = 0; i < n; i++){
+		for(uint i = 0; i < n; i++){
 			if(cvar_name == preset_cvars[i]){
 				return i;
 			}
@@ -165,7 +165,7 @@ class AimAssistHandler : StaticEventHandler{
 			
 			let PRESET_COUNT = preset_cvars.Size();
 			
-			for(uint i = 0; i < n; i++) {
+			for(int i = 0; i < n; i++) {
 				bool invalid = false;
 				let key = keys[i];
 				let value = presets.Get(key);
@@ -178,7 +178,7 @@ class AimAssistHandler : StaticEventHandler{
 					let n = obj_keys.Size();
 					Array<int> cvar_key_count;
 					cvar_key_count.Resize(PRESET_COUNT);
-					for(uint i = 0; i < n; i++) {
+					for(int i = 0; i < n; i++) {
 						let cvar_name = obj_keys[i];
 						int j = FindPresetCVarName(cvar_name);
 						if(j == PRESET_COUNT) {
@@ -209,7 +209,7 @@ class AimAssistHandler : StaticEventHandler{
 				}
 			}
 			n = invalidKeys.Size();
-			for(uint i = 0; i < n; i++) {
+			for(int i = 0; i < n; i++) {
 				presets.delete(invalidKeys[i]);
 			}
 		}
@@ -265,6 +265,17 @@ class AimAssistHandler : StaticEventHandler{
 		}
 	}
 	
+	clearscope void ResetCVarsToDefault(bool performance = false) {
+		let n = preset_cvars.Size();
+		for(uint i = 0; i < n; i++){
+			CVar.FindCVar(preset_cvars[i]).ResetToDefault();
+		}
+		if(performance) {
+			CVar.FindCVar("cl_aim_assist_precision").SetFloat(2.0);
+			CVar.FindCVar("cl_aim_assist_radial_precision").SetInt(45);
+		}
+	}
+	
 	clearscope void ExecuteCommand(name cmd,string data) {
 		switch(cmd) {
 		case Name("SaveUserPreset"):
@@ -280,6 +291,11 @@ class AimAssistHandler : StaticEventHandler{
 			break;
 		case Name("ResetToDefault"):
 		case Name("LoadDefaultPreset"):
+			ResetCVarsToDefault();
+			break;
+		case Name("LoadPerformancePreset"):
+			ResetCVarsToDefault(true);
+			break;
 		default:
 			console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."unkonwn confirm command "..cmd.." , ignoring it");
 		}

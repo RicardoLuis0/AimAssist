@@ -13,6 +13,12 @@ OptionMenu "AimAssistPresetMenu" {
 
 OptionMenu "AimAssistBuiltInPresets" {
 	
+	Title "Built-In Presets"
+	
+	AimAssistConfirmCommand "Default", "LoadDefaultPreset", "", "Are you sure you want to load the default preset?"
+	
+	AimAssistConfirmCommand "Performance", "LoadPerformancePreset", "", "Are you sure you want to load the performance preset?"
+	
 }
 
 OptionMenu "AimAssistUserPresets" {
