@@ -7,6 +7,7 @@
 	User Float cl_aim_assist_max_dist = 5000;
 	User Float cl_aim_assist_rot_speed = 1;
 	User Int cl_aim_assist_method = 1;
+	User Int cl_aim_assist_enable_mode = 0;
 
 // -----------
 //  aim height

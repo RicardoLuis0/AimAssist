@@ -1,5 +1,7 @@
 class AimAssistPlayerData {
 	bool enabled;//if assist is enabled or not
+	
+	int enable_mode;
 
 	double max_angle;//max assist angle
 	double precision;//assist angle precision
@@ -58,6 +60,7 @@ class AimAssistPlayerData {
 		mIsEnabled=CVAR.GetCVar("cl_recenter_enabled",player).getBool();
 		mStep=CVAR.GetCVar("cl_recenter_step",player).getFloat();
 		always_recenter=CVAR.GetCVar("cl_recenter_always_enabled",player).getBool();
+		enable_mode=CVAR.GetCVar("cl_aim_assist_enable_mode",player).getInt();
 	}
 	
 	float lerp(float v0,float v1,float t){
@@ -131,8 +134,16 @@ class AimAssistPlayerData {
 		return closest,closest_distance,hitloc;
 	}
 	
-	bool aimEnabled(){
-		return enabled == !hold;
+	bool aimEnabled(PlayerInfo player){
+		switch(enable_mode){
+		default:
+		case 0://always
+			return enabled == !hold;
+		case 1:// look or move
+			return (enabled == !hold) && ((abs(player.cmd.yaw) + abs(player.cmd.pitch) + abs(player.cmd.roll) + abs(player.cmd.forwardmove) + abs(player.cmd.sidemove) + abs(player.cmd.upmove)) > 0);
+		case 2:// look
+			return (enabled == !hold) && ((abs(player.cmd.yaw) + abs(player.cmd.pitch) + abs(player.cmd.roll)) > 0);
+		}
 	}
 	
 	/* Copyright Alexander Kromm (mmaulwurff@gmail.com) 2020-2021 */

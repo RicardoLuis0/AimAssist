@@ -48,8 +48,22 @@ class AimAssistHandler : StaticEventHandler{
 		// -----------
 			"cl_recenter_enabled",
 			"cl_recenter_step",
-			"cl_recenter_always_enabled"
+			"cl_recenter_always_enabled",
+		// -----------
+		//  new
+		// -----------
+			"cl_aim_assist_enable_mode"
 	};
+	
+	const NEW_CVAR_COUNT = 1; // new cvars are allowed to be missing when loading presets
+	
+	static const int new_cvar_defaults_int[] = {
+		0 // cl_aim_assist_enable_mode
+	};
+	static const int new_cvar_defaults_double[] = {
+		-1 // invalid
+	};
+
 	
 	static const Name old_cvars[] = {
 		"AIM_ASSIST_ENABLED",
@@ -112,7 +126,11 @@ class AimAssistHandler : StaticEventHandler{
 		// -----------
 			"AimAssist_JsonBool",	// cl_recenter_enabled
 			"AimAssist_JsonNumber",	// cl_recenter_step
-			"AimAssist_JsonBool"	// cl_recenter_always_enabled
+			"AimAssist_JsonBool",	// cl_recenter_always_enabled
+		// -----------
+		//  new
+		// -----------
+			"AimAssist_JsonNumber"	// cl_aim_assist_enable_mode
 	};
 	
 	
@@ -154,6 +172,10 @@ class AimAssistHandler : StaticEventHandler{
 			"Bool",		// cl_recenter_enabled
 			"Number",	// cl_recenter_step
 			"Bool"		// cl_recenter_always_enabled
+		// -----------
+		//  new
+		// -----------
+			"Number"	// cl_aim_assist_enable_mode
 	};
 	
 	
@@ -221,8 +243,29 @@ class AimAssistHandler : StaticEventHandler{
 					
 					for(uint i = 0; i < PRESET_COUNT; i++) {
 						if(cvar_key_count[i] == 0) {
-							invalid = true;
-							console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' is missing CVar '"..preset_cvars[i].."'");
+							if( i < (PRESET_COUNT - NEW_CVAR_COUNT))
+							{
+								invalid = true;
+								console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."Aim Assist Preset '"..key.."' is missing CVar '"..preset_cvars[i].."'");
+							}
+							else
+							{
+								console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_ORANGE.."Aim Assist Preset '"..key.."' is missing CVar '"..preset_cvars[i].."', loading defaults");
+								let c = CVar.FindCVar(preset_cvars[i]);
+								let ii = i - (PRESET_COUNT - NEW_CVAR_COUNT);
+								switch(c.GetRealType()){
+								case CVar.CVAR_Int:
+									obj.Set(preset_cvars[i],AimAssist_JsonInt.make(new_cvar_defaults_int[ii]));
+									break;
+								case CVar.CVAR_Float:
+									obj.Set(preset_cvars[i],AimAssist_JsonDouble.make(new_cvar_defaults_double[ii]));
+									break;
+								case CVar.CVAR_Bool:
+									obj.Set(preset_cvars[i],AimAssist_JsonBool.make(new_cvar_defaults_int[ii]));
+									break;
+								}
+								
+							}
 						}
 					}
 				}
@@ -266,6 +309,7 @@ class AimAssistHandler : StaticEventHandler{
 	}
 	
 	clearscope void LoadPreset(string preset_name) {
+		ResetToDefault();
 		let obj_e = presets.Get(preset_name);
 		if(obj_e && obj_e is "AimAssist_JsonObject") {
 			let obj = AimAssist_JsonObject(obj_e);
@@ -290,7 +334,8 @@ class AimAssistHandler : StaticEventHandler{
 	}
 	
 	clearscope void LoadOldCVars() {
-		let n = preset_cvars.Size();
+		ResetToDefault();
+		let n = old_cvars.Size();
 		for(uint i = 0; i < n; i++) {
 			CVar c = CVar.FindCVar(preset_cvars[i]);
 			switch(c.GetRealType()) {
@@ -440,74 +485,80 @@ class AimAssistHandler : StaticEventHandler{
 
 	//main method, does all work
 	bool doAim(int pnum){
-		if(!playerData[pnum].aimEnabled()) return false;
+		let pdata = playerData[pnum];
+		let pi = players[pnum];
+		let pp = players[pnum].mo;
+		if(!pdata.aimEnabled(players[pnum])){
+			ClearMarkers();
+			return false;
+		}
 		PlayerPawn pawn=players[pnum].mo;
 		
 		bool do_mark=pnum==consoleplayer&&mark;
 		
-		float closest_distance=playerData[pnum].max_distance+1;
+		float closest_distance=pdata.max_distance+1;
 		Actor closest=null;
 		Actor hit=null;
 		Vector3 hitloc=(0,0,0);
 		
 		//check straight ahead
-		[closest,closest_distance,hitloc]=playerData[pnum].doTrace(pawn,0,0,closest,closest_distance);
+		[closest,closest_distance,hitloc]=pdata.doTrace(pp,0,0,closest,closest_distance);
 		
-		double precision=playerData[pnum].precision;
-		double radial_precision=playerData[pnum].radial_precision;
-		double max_angle=playerData[pnum].max_angle;
-		int method=playerData[pnum].method;
+		double precision=pdata.precision;
+		double radial_precision=pdata.radial_precision;
+		double max_angle=pdata.max_angle;
+		int method=pdata.method;
 		
 		//check in a circle around the direction player's looking
 		for(double i_a=precision;i_a<=max_angle;i_a+=precision){
 			for(double i_r=0;i_r<=360&&!(closest&&method==1);i_r+=radial_precision){
-				[closest,closest_distance,hitloc]=playerData[pnum].doTrace(pawn,i_a,i_r,closest,closest_distance);
+				[closest,closest_distance,hitloc]=pdata.doTrace(pp,i_a,i_r,closest,closest_distance);
 			}
 		}
 		//if there was an enemy found
 		if(closest){
-			float pheight=pawn.viewheight*pawn.player.crouchfactor;
-			Vector3 aimheight=(0,0,playerData[pnum].getAimHeight(closest.height,pheight,closest_distance));
+			float pheight=pp.viewheight*pp.player.crouchfactor;
+			Vector3 aimheight=(0,0,pdata.getAimHeight(closest.height,pheight,closest_distance));
 			Vector3 delta;
 			double target_angle,target_pitch;
-			Vector3 view=pawn.pos+(0,0,pheight);
+			Vector3 view=pp.pos+(0,0,pheight);
 			//get target angle and pitch
 			[delta,target_angle,target_pitch]=lookAt(view,closest.pos+aimheight);
 
 			//show/move markers
 			if(do_mark){
 				if(!marker1){
-					marker1=AimAssistDebugMaker1(pawn.Spawn("AimAssistDebugMaker1",pawn.pos,NO_REPLACE));
+					marker1=AimAssistDebugMaker1(pp.Spawn("AimAssistDebugMaker1",pp.pos,NO_REPLACE));
 				}
 				if(!marker2){
-					marker2=AimAssistDebugMaker2(pawn.Spawn("AimAssistDebugMaker2",pawn.pos,NO_REPLACE));
+					marker2=AimAssistDebugMaker2(pp.Spawn("AimAssistDebugMaker2",pp.pos,NO_REPLACE));
 				}
 				marker1.setOrigin(hitloc,true);
 				marker2.setOrigin(closest.pos+aimheight,true);
 			}
 			
 			//check if view is obstructed
-			if(playerData[pnum].check_obstacles){
+			if(pdata.check_obstacles){
 				FLineTraceData t;
-				double max_distance=playerData[pnum].max_distance;
-				pawn.LineTrace(target_angle,max_distance,target_pitch,TRF_NOSKY,pawn.viewheight*pawn.player.crouchfactor,data:t);
+				double max_distance=pdata.max_distance;
+				pp.LineTrace(target_angle,max_distance,target_pitch,TRF_NOSKY,pp.viewheight*pp.player.crouchfactor,data:t);
 				if(t.hitType!=TRACE_HitActor||t.hitActor!=closest){
 					if(do_mark){
 						if(!marker3){
-							marker3=AimAssistDebugMaker3(pawn.Spawn("AimAssistDebugMaker3",pawn.pos,NO_REPLACE));
+							marker3=AimAssistDebugMaker3(pp.Spawn("AimAssistDebugMaker3",pp.pos,NO_REPLACE));
 						}
 						marker3.setOrigin(t.hitLocation,false);
 					}
-					switch(playerData[pnum].on_obstruction){
+					switch(pdata.on_obstruction){
 					default:
 					case 1://aim correction
 						//try to aim at correct z
 						[delta,target_angle,target_pitch]=lookAt(view,(hitloc.x,hitloc.y,closest.pos.z+aimheight.z));
-						pawn.LineTrace(target_angle,max_distance,target_pitch,TRF_NOSKY,pawn.viewheight*pawn.player.crouchfactor,data:t);
+						pp.LineTrace(target_angle,max_distance,target_pitch,TRF_NOSKY,pp.viewheight*pp.player.crouchfactor,data:t);
 						if(t.hitType==TRACE_HitActor&&t.hitActor==closest){
 							if(do_mark){
 								if(!marker4){
-									marker4=AimAssistDebugMaker4(pawn.Spawn("AimAssistDebugMaker4",pawn.pos,NO_REPLACE));
+									marker4=AimAssistDebugMaker4(pp.Spawn("AimAssistDebugMaker4",pp.pos,NO_REPLACE));
 								}
 								marker4.setOrigin((hitloc.x,hitloc.y,closest.pos.z+aimheight.z),false);
 							}
@@ -515,11 +566,11 @@ class AimAssistHandler : StaticEventHandler{
 						}
 						//try to aim at correct xy
 						[delta,target_angle,target_pitch]=lookAt(view,(closest.pos.x,closest.pos.y,hitloc.z));
-						pawn.LineTrace(target_angle,max_distance,target_pitch,TRF_NOSKY,pawn.viewheight*pawn.player.crouchfactor,data:t);
+						pp.LineTrace(target_angle,max_distance,target_pitch,TRF_NOSKY,pp.viewheight*pp.player.crouchfactor,data:t);
 						if(t.hitType==TRACE_HitActor&&t.hitActor==closest){
 							if(do_mark){
 								if(!marker4){
-									marker4=AimAssistDebugMaker4(pawn.Spawn("AimAssistDebugMaker4",pawn.pos,NO_REPLACE));
+									marker4=AimAssistDebugMaker4(pp.Spawn("AimAssistDebugMaker4",pp.pos,NO_REPLACE));
 								}
 								marker4.setOrigin((closest.pos.x,closest.pos.y,hitloc.z),false);
 							}
@@ -529,7 +580,7 @@ class AimAssistHandler : StaticEventHandler{
 						[delta,target_angle,target_pitch]=lookAt(view,hitloc);
 						if(do_mark){
 							if(!marker4){
-								marker4=AimAssistDebugMaker4(pawn.Spawn("AimAssistDebugMaker4",pawn.pos,NO_REPLACE));
+								marker4=AimAssistDebugMaker4(pp.Spawn("AimAssistDebugMaker4",pp.pos,NO_REPLACE));
 							}
 							marker4.setOrigin(hitloc,false);
 						}
@@ -543,24 +594,24 @@ class AimAssistHandler : StaticEventHandler{
 			}
 
 			//get angle difference
-			double angle_diff=pawn.DeltaAngle(pawn.angle,target_angle);
-			double pitch_diff=pawn.DeltaAngle(pawn.pitch,target_pitch);
+			double angle_diff=pp.DeltaAngle(pp.angle,target_angle);
+			double pitch_diff=pp.DeltaAngle(pp.pitch,target_pitch);
 
-			double rot_speed=playerData[pnum].rot_speed;
+			double rot_speed=pdata.rot_speed;
 			//check rotation speed
 			if(abs(angle_diff)>rot_speed){
 				//if rotation speed is lower than difference, add/subtract rotation speed
-				pawn.A_SetAngle(pawn.angle+(angle_diff>0?rot_speed:-rot_speed),SPF_INTERPOLATE);
+				pp.A_SetAngle(pp.angle+(angle_diff>0?rot_speed:-rot_speed),SPF_INTERPOLATE);
 			}else{
 				//if rotation speed is higher than differece, set to target angle
-				pawn.A_SetAngle(target_angle,SPF_INTERPOLATE);
+				pp.A_SetAngle(target_angle,SPF_INTERPOLATE);
 			}
 			if(abs(pitch_diff)>rot_speed){
 				//if rotation speed is lower than difference, add/subtract rotation speed
-				pawn.A_SetPitch(pawn.pitch+(pitch_diff>0?rot_speed:-rot_speed),SPF_INTERPOLATE);
+				pp.A_SetPitch(pp.pitch+(pitch_diff>0?rot_speed:-rot_speed),SPF_INTERPOLATE);
 			}else{
 				//if rotation speed is higher than differece, set to target pitch
-				pawn.A_SetPitch(target_pitch,SPF_INTERPOLATE);
+				pp.A_SetPitch(target_pitch,SPF_INTERPOLATE);
 			}
 			return true;
 		}else{
