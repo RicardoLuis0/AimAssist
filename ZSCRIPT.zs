@@ -108,17 +108,17 @@ class AimAssistPlayerData
 	
 	float getAimRatio(float distance)
 	{
-		if(distance >= transition_start)
-		{
-			return 1;
-		}
-		else if(distance < transition_end)
+		if(distance < transition_start)
 		{
 			return 0;
 		}
+		else if(distance >= transition_end)
+		{
+			return 1;
+		}
 		else
 		{
-			return (distance - transition_end) / (transition_start - transition_end);
+			return (distance - transition_start) / (transition_end - transition_start);
 		}
 	}
 	
