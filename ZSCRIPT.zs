@@ -42,9 +42,9 @@ class AimAssistPlayerData
 	const /*int*/ aim_height_mode = 2;
 	
 	//Distance to start transition between monster and player view heights, used if aim height mode is 'both'
-	const /*double*/ transition_start = 100;
+	const /*double*/ transition_start = 500;
 	//Distance to end transition between monster and player view heights, used if aim height mode is 'both'
-	const /*double*/ transition_end = 500;
+	const /*double*/ transition_end = 100;
 
 // --------------------------- HARDCODED SETTINGS ---------------------------
 
@@ -108,17 +108,17 @@ class AimAssistPlayerData
 	
 	float getAimRatio(float distance)
 	{
-		if(distance < transition_start)
-		{
-			return 0;
-		}
-		else if(distance >= transition_end)
+		if(distance >= transition_start)
 		{
 			return 1;
 		}
+		else if(distance < transition_end)
+		{
+			return 0;
+		}
 		else
 		{
-			return (distance - transition_start) / (transition_end - transition_start);
+			return (distance - transition_end) / (transition_start - transition_end);
 		}
 	}
 	
