@@ -179,7 +179,7 @@ class AimAssistHandler : StaticEventHandler{
 	};
 	
 	
-	int FindPresetCVarName(String cvar_name){
+	int FindPresetCVarName(Name cvar_name){
 		let n = preset_cvars.Size();
 		for(uint i = 0; i < n; i++){
 			if(cvar_name == preset_cvars[i]){
@@ -496,7 +496,16 @@ class AimAssistHandler : StaticEventHandler{
 		
 		bool do_mark=pnum==consoleplayer&&mark;
 		
-		float closest_distance=pdata.max_distance+1;
+		double precision=pdata.precision.getFloat();
+		double radial_precision=pdata.radial_precision.getFloat();
+		double max_angle=pdata.max_angle.getFloat();
+		double max_distance=pdata.max_distance.getFloat();
+		int method=pdata.method.getInt();
+		
+		
+		
+		
+		float closest_distance=max_distance+1;
 		Actor closest=null;
 		Actor hit=null;
 		Vector3 hitloc=(0,0,0);
@@ -504,10 +513,6 @@ class AimAssistHandler : StaticEventHandler{
 		//check straight ahead
 		[closest,closest_distance,hitloc]=pdata.doTrace(pp,0,0,closest,closest_distance);
 		
-		double precision=pdata.precision;
-		double radial_precision=pdata.radial_precision;
-		double max_angle=pdata.max_angle;
-		int method=pdata.method;
 		
 		//check in a circle around the direction player's looking
 		for(double i_a=precision;i_a<=max_angle;i_a+=precision){
@@ -538,9 +543,8 @@ class AimAssistHandler : StaticEventHandler{
 			}
 			
 			//check if view is obstructed
-			if(pdata.check_obstacles){
+			if(pdata.check_obstacles.getBool()){
 				FLineTraceData t;
-				double max_distance=pdata.max_distance;
 				pp.LineTrace(target_angle,max_distance,target_pitch,TRF_NOSKY,pp.viewheight*pp.player.crouchfactor,data:t);
 				if(t.hitType!=TRACE_HitActor||t.hitActor!=closest){
 					if(do_mark){
@@ -549,7 +553,7 @@ class AimAssistHandler : StaticEventHandler{
 						}
 						marker3.setOrigin(t.hitLocation,false);
 					}
-					switch(pdata.on_obstruction){
+					switch(pdata.on_obstruction.getInt()){
 					default:
 					case 1://aim correction
 						//try to aim at correct z
@@ -597,7 +601,7 @@ class AimAssistHandler : StaticEventHandler{
 			double angle_diff=pp.DeltaAngle(pp.angle,target_angle);
 			double pitch_diff=pp.DeltaAngle(pp.pitch,target_pitch);
 
-			double rot_speed=pdata.rot_speed;
+			double rot_speed=pdata.rot_speed.getFloat();
 			//check rotation speed
 			if(abs(angle_diff)>rot_speed){
 				//if rotation speed is lower than difference, add/subtract rotation speed
@@ -627,7 +631,7 @@ class AimAssistHandler : StaticEventHandler{
 		//if no keys are held and it's enabled, or keys are held and it's disabled, run the aim assist
 		for(int i=0;i<MAXPLAYERS;i++){
 			if(playeringame[i]){
-				if(!doAim(i)||playerData[i].always_recenter){
+				if(!doAim(i)||playerData[i].always_recenter.getBool()){
 					playerData[i].doRecenter(players[i].mo);
 				}
 			}
@@ -646,10 +650,10 @@ class AimAssistHandler : StaticEventHandler{
 			}
 		}else if(e.name=="AimAssistToggle"){
 			//toggle key pressed
-			playerData[e.player].enabled=!playerData[e.player].enabled;
 			if(e.player==consoleplayer){
-				CVAR.getCVar("cl_aim_assist_enabled",players[e.player]).setBool(playerData[e.player].enabled);
-				console.printf("Aim Assist "..(playerData[e.player].enabled?"On":"Off"));
+				CVar enabled = CVAR.GetCVar("cl_aim_assist_enabled",players[e.player]);
+				console.printf("Aim Assist "..((!enabled.GetBool())?"On":"Off"));
+				enabled.SetBool(!enabled.GetBool());
 			}
 		}else if(e.name=="AimAssistCenterView"){
 			//center view
