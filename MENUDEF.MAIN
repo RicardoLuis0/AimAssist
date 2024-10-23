@@ -32,6 +32,4 @@ OptionMenu "AimAssistMenu" {
 	StaticText "---","Gold"
 	StaticText ""
 	Submenu "Debug","AimAssistDebugOptions"
-	StaticText ""
-	Command "Update Settings (Ingame)","netevent AimAssistUpdateCVARs"
 }

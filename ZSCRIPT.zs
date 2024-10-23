@@ -1,4 +1,4 @@
-version "4.10.0"
+version "4.12.2"
 #include "ZScript/AimAssist/Handler.zs"
 #include "ZScript/AimAssist/PlayerData.zs"
 #include "ZScript/AimAssist/Marker.zs"

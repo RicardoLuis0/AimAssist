@@ -2,6 +2,7 @@ class AimAssistDebugMaker1:Actor{
 	Default{
 		+NOINTERACTION
 		+FORCEXYBILLBOARD
+		+NOSAVEGAME
 		FloatBobPhase 0;
 	}
 	States{

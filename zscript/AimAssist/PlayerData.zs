@@ -34,10 +34,10 @@ class AimAssistPlayerData {
 	
 	CVar /*int*/ enable_mode;
 	
-	CVar /*bool*/ debug_traces;
-	
-	void UpdateCVARs(int pnum){
-		PlayerInfo player=players[pnum];
+	void UpdateCVARs(int pnum)
+	{
+		PlayerInfo player = players[pnum];
+		
 		enabled=CVAR.GetCVar("cl_aim_assist_enabled",player);
 		max_angle=CVAR.GetCVar("cl_aim_assist_angle_max",player);
 		precision=CVAR.GetCVar("cl_aim_assist_precision",player);
@@ -60,7 +60,6 @@ class AimAssistPlayerData {
 		mStep=CVAR.GetCVar("cl_recenter_step",player);
 		always_recenter=CVAR.GetCVar("cl_recenter_always_enabled",player);
 		enable_mode=CVAR.GetCVar("cl_aim_assist_enable_mode",player);
-		debug_traces=CVAR.GetCVar("cl_aim_assist_trace_debug",player);
 	}
 	
 	float lerp(float v0,float v1,float t){
@@ -97,7 +96,7 @@ class AimAssistPlayerData {
 		}
 	}
 	//do linetrace and get results
-	play Actor,double,Vector3 doTrace(PlayerPawn a,double i_angle,double i_rotation,Actor closest,double closest_distance){
+	play Actor,double,Vector3 doTrace(PlayerPawn a,double i_angle,double i_rotation,Actor closest,double closest_distance, bool debug_traces){
 		FLineTraceData t;
 		Vector3 hitloc=(0,0,0);
 		//do a linetrace around i_a and i_r in a circle
@@ -117,15 +116,15 @@ class AimAssistPlayerData {
 						closest_distance=a.Distance3D(t.HitActor);
 						hitloc=t.HitLocation;
 					}
-					if(debug_traces.getBool()){
+					if(debug_traces){
 						let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
 						a.A_SpawnParticle("#FF0000",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);
 					}
-				} else if (debug_traces.getBool()) {
+				} else if (debug_traces) {
 					let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
 					a.A_SpawnParticle("#FFFF00",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);
 				}
-			} else if (debug_traces.getBool()) {
+			} else if (debug_traces) {
 				
 				let hitDist = level.Vec3Diff(a.pos,t.hitLocation).length();
 				a.A_SpawnParticle("#00FF00",SPF_FULLBRIGHT,1,clamp(hitDist/100,2.5,75),xoff:t.hitLocation.x - a.pos.x,t.hitLocation.y - a.pos.y,t.hitLocation.z - a.pos.z);

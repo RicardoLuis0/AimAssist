@@ -1,6 +1,8 @@
 class AimAssistHandler : StaticEventHandler{
 
+	CVar cl_mark;
 	bool mark;//if to display markers or not
+	CVar debug_traces;
 
 	AimAssistDebugMaker1 marker1;//target marker
 	AimAssistDebugMaker2 marker2;//current aim marker
@@ -60,33 +62,9 @@ class AimAssistHandler : StaticEventHandler{
 	static const int new_cvar_defaults_int[] = {
 		0 // cl_aim_assist_enable_mode
 	};
+	
 	static const int new_cvar_defaults_double[] = {
 		-1 // invalid
-	};
-
-	
-	static const Name old_cvars[] = {
-		"AIM_ASSIST_ENABLED",
-		"AIM_ASSIST_ANGLE_MAX",
-		"AIM_ASSIST_MAX_DIST",
-		"AIM_ASSIST_ROT_SPEED",
-		"AIM_ASSIST_METHOD",
-		"AIM_ASSIST_HEIGHT_MODE",
-		"AIM_ASSIST_VERTICAL_PLUS_OFFSET_ENEMY",
-		"AIM_ASSIST_VERTICAL_MINUS_OFFSET_ENEMY",
-		"AIM_ASSIST_ENEMY_HEIGHT_MULT",
-		"AIM_ASSIST_VERTICAL_PLUS_OFFSET_PLAYER",
-		"AIM_ASSIST_VERTICAL_MINUS_OFFSET_PLAYER",
-		"AIM_ASSIST_PLAYER_HEIGHT_MULT",
-		"AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_START",
-		"AIM_ASSIST_HEIGHT_MODE_TRANSITION_DISTANCE_END",
-		"AIM_ASSIST_PRECISION",
-		"AIM_ASSIST_RADIAL_PRECISION",
-		"AIM_ASSIST_CHECK_FOR_OBSTACLES",
-		"AIM_ASSIST_ON_OBSTRUCTION",
-		"rc_enabled",
-		"rc_step",
-		"rc_always_enabled"
 	};
 	
 	static const Class<AimAssist_JsonElement> preset_cvar_json_types[] = {
@@ -193,6 +171,10 @@ class AimAssistHandler : StaticEventHandler{
 		for(int i=0;i<MAXPLAYERS;i++){
 			playerData[i]=new("AimAssistPlayerData");
 		}
+		
+		cl_mark = CVar.FindCVar("cl_aim_assist_debug_marker");
+		debug_traces = CVar.FindCVar("cl_aim_assist_trace_debug");
+		
 		let presetsOrError = AimAssist_JSON.parse(__aim_assist_user_presets_json);
 		if(!(presetsOrError is "AimAssist_JsonObject")){
 			if(presetsOrError is "AimAssist_JsonError"){
@@ -333,25 +315,6 @@ class AimAssistHandler : StaticEventHandler{
 		}
 	}
 	
-	clearscope void LoadOldCVars() {
-		ResetToDefault();
-		let n = old_cvars.Size();
-		for(uint i = 0; i < n; i++) {
-			CVar c = CVar.FindCVar(preset_cvars[i]);
-			switch(c.GetRealType()) {
-			case CVar.CVAR_Int:
-				c.SetInt(CVar.FindCVar(old_cvars[i]).GetInt());
-				break;
-			case CVar.CVAR_Float:
-				c.SetFloat(CVar.FindCVar(old_cvars[i]).GetFloat());
-				break;
-			case CVar.CVAR_Bool:
-				c.SetBool(CVar.FindCVar(old_cvars[i]).GetBool());
-				break;
-			}
-		}
-	}
-	
 	clearscope void ResetToDefault(bool performance = false) {
 		let n = preset_cvars.Size();
 		for(uint i = 0; i < n; i++){
@@ -383,60 +346,14 @@ class AimAssistHandler : StaticEventHandler{
 		case Name("LoadPerformancePreset"):
 			ResetToDefault(true);
 			break;
-		case Name("LoadOldCVars"):
-			LoadOldCVars();
-			break;
 		default:
 			console.PrintfEx(PRINT_NONOTIFY,TEXTCOLOR_RED.."unkonwn confirm command "..cmd.." , ignoring it");
 		}
 	}
-
-	override void WorldLoaded(WorldEvent e){
-		marker1=null;
-		marker2=null;
-		marker3=null;
-		marker4=null;
-		for(int i=0;i<MAXPLAYERS;i++) {
-			if(playeringame[i]) {
-				UpdateCVARs(i);
-			}
-		}
-	}
 	
 	override void PlayerEntered(PlayerEvent e){
-		UpdateCVARs(e.playernumber);
-	}
-	
-	override void WorldUnloaded(WorldEvent e){
-		marker1=null;
-		marker2=null;
-		marker3=null;
-		marker4=null;
-	}
-	
-	override void PlayerDisconnected(PlayerEvent e){
-		if(e.PlayerNumber==consoleplayer){
-			if(mark){
-				ClearMarkers();
-			}
-		}
-	}
-
-	//update cvar values
-	void UpdateCVARs(int pnum){
-		playerData[pnum].UpdateCVARs(pnum);
-		if(pnum==consoleplayer){
-			ClearMarkers();
-			mark=CVAR.GetCVar("cl_aim_assist_debug_marker",players[consoleplayer]).getBool();
-		}
-	}
-
-	void UpdateAllCVARs(){
-		for(int i=0;i<MAXPLAYERS;i++){
-			if(playeringame[i]){
-				UpdateCVARs(i);
-			}
-		}
+		//UpdateCVARs(e.playernumber);
+		playerData[e.playernumber].UpdateCVARs(e.playernumber);
 	}
 	
 	//get rid of markers in world
@@ -494,7 +411,14 @@ class AimAssistHandler : StaticEventHandler{
 		}
 		PlayerPawn pawn=players[pnum].mo;
 		
-		bool do_mark=pnum==consoleplayer&&mark;
+		if(mark != cl_mark.getBool())
+		{
+			mark = !mark;
+			ClearMarkers();
+		}
+		
+		bool do_mark = (pnum == consoleplayer && mark);
+		bool do_trace = (pnum == consoleplayer && debug_traces.getBool());
 		
 		double precision=pdata.precision.getFloat();
 		double radial_precision=pdata.radial_precision.getFloat();
@@ -511,13 +435,13 @@ class AimAssistHandler : StaticEventHandler{
 		Vector3 hitloc=(0,0,0);
 		
 		//check straight ahead
-		[closest,closest_distance,hitloc]=pdata.doTrace(pp,0,0,closest,closest_distance);
+		[closest,closest_distance,hitloc]=pdata.doTrace(pp,0,0,closest,closest_distance,do_trace);
 		
 		
 		//check in a circle around the direction player's looking
 		for(double i_a=precision;i_a<=max_angle;i_a+=precision){
 			for(double i_r=0;i_r<=360&&!(closest&&method==1);i_r+=radial_precision){
-				[closest,closest_distance,hitloc]=pdata.doTrace(pp,i_a,i_r,closest,closest_distance);
+				[closest,closest_distance,hitloc]=pdata.doTrace(pp,i_a,i_r,closest,closest_distance,do_trace);
 			}
 		}
 		//if there was an enemy found
@@ -636,19 +560,10 @@ class AimAssistHandler : StaticEventHandler{
 				}
 			}
 		}
-		if (gameaction == ga_savegame || gameaction == ga_autosave) {
-			ClearMarkers();
-		}
 	}
 
 	override void NetworkProcess(ConsoleEvent e){
-		if(e.name=="AimAssistUpdateCVARs"){
-			//player asked to update cvars
-			UpdateCVARs(e.player);
-			if(e.player==consoleplayer){
-				console.printf("Aim Assist CVARs Updated");
-			}
-		}else if(e.name=="AimAssistToggle"){
+		if(e.name=="AimAssistToggle"){
 			//toggle key pressed
 			if(e.player==consoleplayer){
 				CVar enabled = CVAR.GetCVar("cl_aim_assist_enabled",players[e.player]);

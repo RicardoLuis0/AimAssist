@@ -11,10 +11,6 @@ OptionMenu "AimAssistPresetMenu" {
 	StaticText ""
 	
 	AimAssistConfirmCommand "Reset to Default", "ResetToDefault", "", "Are you sure you want to reset to default settings?"
-	StaticText ""
-	StaticText ""
-	
-	AimAssistConfirmCommand "Load Old Format Config", "LoadOldCVars", "", "Are you sure you want to replace the current config?"
 }
 
 OptionMenu "AimAssistBuiltInPresets" {
