@@ -3,6 +3,12 @@ OptionValue "AimAssist_AssistMethods" {
 	0,"Closest to Player"
 }
 
+OptionValue "AimAssist_EnableMode" {
+	0,"Always"
+	1,"Only When Looking or Moving"
+	2,"Only When Moving"
+}
+
 OptionMenu "AimAssistBasicOptions" {
 	Title "Aim Assist Options"
 	StaticText ""
@@ -21,4 +27,7 @@ OptionMenu "AimAssistBasicOptions" {
 	Option "Targeting Method","cl_aim_assist_method","AimAssist_AssistMethods"
 	StaticText "Target Selection Method","DarkRed"
 	StaticText "\"Closer to crosshair\" has better performance","DarkRed"
+	StaticText ""
+	Option "Enable Mode","cl_aim_assist_enable_mode","AimAssist_EnableMode"
+	StaticText "Whether to always aim assist, or only when moving/looking","DarkRed"
 }
