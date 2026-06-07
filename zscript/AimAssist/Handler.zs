@@ -352,8 +352,16 @@ class AimAssistHandler : StaticEventHandler{
 	}
 	
 	override void PlayerEntered(PlayerEvent e){
-		//UpdateCVARs(e.playernumber);
 		playerData[e.playernumber].UpdateCVARs(e.playernumber);
+	}
+	
+	override void WorldLoaded(WorldEvent e)
+	{
+		for(int i=0;i<MAXPLAYERS;i++)
+		{
+			if(playeringame[i])
+				playerData[i].UpdateCVARs(i);
+		}
 	}
 	
 	//get rid of markers in world
